@@ -42,7 +42,7 @@ function getKunjungan()
         $tgl = $_GET["tgl"];
         $urut = $_GET["urut"];
     }
-    $query = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek = '$tgl' && NoUrut = '$urut'");
+    $query = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '$tgl%' && NoUrut = '$urut'");
     while ($row = mysqli_fetch_object($query)) {
         $data[] = $row;
     }
@@ -68,23 +68,35 @@ function getKunjunganTanggal()
     if (!empty($_GET["filter"])) {
         $tanggal = $_GET["filter"];
     }
-    $query = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggal%'");
-    while ($row = mysqli_fetch_object($query)) {
-        $data[] = $row;
+    $queryAll = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggal%'");
+
+    $offset = ($_GET['pag'] - 1) * 25;
+    $queryLimit = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggal%' LIMIT 25 OFFSET {$offset}");
+
+    $dataAll = [];
+    $dataLimit = [];
+    while ($row = mysqli_fetch_object($queryAll)) {
+        $dataAll[] = $row;
+    }
+    while ($row = mysqli_fetch_object($queryLimit)) {
+        $dataLimit[] = $row;
     }
 
-    if ($query) {
+    if ($queryAll || $queryLimit) {
         $res = array(
             'message' => 'Filter Kunjungan by Tanggal Success',
-            'data' => $data
+            'dataAll' => $dataAll,
+            'dataLimit' => $dataLimit
         );
     } else {
         $res = array(
             'message' => 'Filter Kunjungan by Tanggal Failed',
-            'mysqli_error' => mysqli_error($conn)
+            'mysqli_error' => mysqli_error($conn),
+            'dataAll' => [],
+            'dataLimit' => []
         );
     }
-    return $data;
+    return $res;
     // header('Content-Type: application/json');
     // echo json_encode($res);
 }
@@ -94,23 +106,34 @@ function getKunjunganId()
     if (!empty($_GET["filter"])) {
         $id = $_GET["filter"];
     }
-    $query = $conn->query("SELECT * FROM kunjungan WHERE ID_pasien LIKE '%$id%'");
-    while ($row = mysqli_fetch_object($query)) {
-        $data[] = $row;
+    $queryAll = $conn->query("SELECT * FROM kunjungan WHERE ID_pasien LIKE '%$id%'");
+    $offset = ($_GET['pag'] - 1) * 25;
+    $queryLimit = $conn->query("SELECT * FROM kunjungan WHERE ID_pasien LIKE '%$id%' LIMIT 25 OFFSET {$offset}");
+
+    $dataAll = [];
+    $dataLimit = [];
+    while ($row = mysqli_fetch_object($queryAll)) {
+        $dataAll[] = $row;
+    }
+    while ($row = mysqli_fetch_object($queryLimit)) {
+        $dataLimit[] = $row;
     }
 
-    if ($query) {
+    if ($queryAll || $queryLimit) {
         $res = array(
             'message' => 'Filter Kunjungan by ID Pasien Success',
-            'data' => $data
+            'dataAll' => $dataAll,
+            'dataLimit' => $dataLimit
         );
     } else {
         $res = array(
             'message' => 'Filter Kunjungan by ID Pasien Failed',
-            'mysqli_error' => mysqli_error($conn)
+            'mysqli_error' => mysqli_error($conn),
+            'dataAll' => [],
+            'dataLimit' => []
         );
     }
-    return $data;
+    return $res;
     // header('Content-Type: application/json');
     // echo json_encode($res);
 }
@@ -133,9 +156,9 @@ function delKunjungan()
         );
     }
     updateTotalKunjungan(false);
-    header('Content-Type: application/json');
-    echo json_encode($res);
-    header("location: /daftarKunjungan.php?pag=1");
+    // header('Content-Type: application/json');
+    // echo json_encode($res);
+    header("location: ./daftarKunjungan.php?pag=1");
 }
 function addKunjungan()
 {
@@ -153,18 +176,18 @@ function addKunjungan()
     }
 
     updateTotalKunjungan(true);
-
-    header('Content-Type: application/json');
-    echo json_encode($res);
-    header("location: /daftarKunjungan.php?pag=1");
+    // header('Content-Type: application/json');
+    // echo json_encode($res);
+    header("location: ./daftarKunjungan.php?pag=1");
 }
-function generateNoUrut()
+function generateNoUrut($tanggal)
 {
     global $conn;
-    if (!empty($_GET["tgl"])) {
-        $tanggal = $_GET["tgl"];
-    }
+    // if (!empty($_GET["tgl"])) {
+    //     $tanggal = $_GET["tgl"];
+    // }
     $query = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggal%'");
+    $data = [];
     while ($row = mysqli_fetch_assoc($query)) {
         $data[] = $row['NoUrut'];
     }
@@ -188,9 +211,9 @@ function generateNoUrut()
             'mysqli_error' => mysqli_error($conn)
         );
     }
-    // return $data;
-    header('Content-Type: application/json');
-    echo json_encode($res);
+    return ($maxval + 1);
+    // header('Content-Type: application/json');
+    // echo json_encode($res);
 }
 
 //=============== PASIEN ===============//

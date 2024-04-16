@@ -150,6 +150,10 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             border-radius: 10px;
         }
 
+        .nav li.active a {
+            font-weight: 700;
+        }
+
         .nav li a {
             padding-inline: 10px;
             text-decoration: none;
@@ -237,7 +241,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 <li>
                     <a href="./daftarKunjungan.php?pag=1">Daftar Kunjungan</a>
                 </li>
-                <li><a href="./inputKunjungan.php?pag=1">Input Data</a></li>
+                <li class="active"><a href="./inputKunjungan.php?pag=1">Input Data</a></li>
+                <li class="logout"><a href="./actionlogout.php">Logout</a></li>
             </ul>
             <span style="text-align: right">
                 <p><b>My Dentist</b></p>
@@ -252,10 +257,11 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                     <p>Search part of</p>
                     <select name="filter-select">
                         <option value="fullname">Fullname</option>
-                        <option value="ID">ID Pasien</option>
-                        <option value="Address">Address</option>
+                        <option value="ID" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'ID' ? 'selected' : '') : '' ?>>ID</option>
+                        <option value="Address" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'Address' ? 'selected' : '') : '' ?>>Address</option>
                     </select>:
-                    <input type="text" name="filter" />
+                    <input type="text" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
+                    <input type="text" name="pag" value="1" style="display: none;">
                     <button style="font-size: small" type="submit">
                         Apply
                     </button>
@@ -278,17 +284,21 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <tbody>
                             <?php
                             include('api.php');
-                            if ($_GET['filter-select'] == "fullname") {
-                                $data_pasien = getPasienNama();
-                            } else if ($_GET['filter-select'] == "ID") {
-                                $data_pasien = getPasienId();
-                            } else if ($_GET['filter-select'] == "Address") {
-                                $data_pasien = getPasienAddress();
+                            if (isset($_GET['filter-select'])) {
+                                if ($_GET['filter-select'] == "fullname") {
+                                    $data_pasien_lengkap = getPasienNama();
+                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                } else if ($_GET['filter-select'] == "ID") {
+                                    $data_pasien_lengkap = getPasienId();
+                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                } else if ($_GET['filter-select'] == "Address") {
+                                    $data_pasien_lengkap = getPasienAddress();
+                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                }
                             } else {
                                 $data_pasien = getAllPasien();
                             }
-                            if (!$_GET['filter-select']) $no = ($_GET['pag'] - 1) * 25 + 1;
-                            else $no = 1;
+                            $no = ($_GET['pag'] - 1) * 25 + 1;
                             foreach ($data_pasien as $data) {
                                 echo '<tr onclick="pilihData(`' . $data->ID . '`)">
                                         <td>' . $no . '</td>
@@ -303,21 +313,57 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                     </table>
                 </div>
             </section>
-            <div class="paginasi" style="margin-inline: auto; width: fit-content">
-                <button onclick="prev()">Prev</button>
-                <button onclick="next()">Next</button>
+            <div class="paginasi" style="margin-inline: auto; width: fit-content; display: flex; gap: 5px;">
+                <?php if (!isset($_GET['filter-select'])) { ?>
+                    <?= $_GET['pag'] > 1 ? '<a class="tombol" href="./inputKunjungan.php?pag=' . ($_GET['pag'] - 1) . '">Prev</a>' : '' ?>
+                    <?php
+                    $data_status = getStatus();
+                    if ($_GET['pag'] * 25 < $data_status->totalPasien) {
+                        echo '<a class="tombol" href="./inputKunjungan.php?pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                    }
+                    ?>
+                <?php } else { ?>
+                    <?php
+                    $totalPasien = count($data_pasien_lengkap['dataAll']);
+                    if ($_GET['pag'] > 1) {
+                        echo '<a class="tombol" href="./inputKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] - 1) . '">Prev</a>';
+                    }
+                    if ($_GET['pag'] * 25 < $totalPasien) {
+                        echo '<a class="tombol" href="./inputKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                    }
+                    ?>
+                <?php } ?>
             </div>
         </div>
         <div class="kanan">
-            <form method="post" action="/api.php?function=addKunjungan">
+            <form method="post" action="./api.php?function=addKunjungan">
                 <section class="container-isian" style="margin-top: 40px">
                     <span>
                         <p>Tgl. Kunjungan:</p>
                         <p>No.Urut per bulan:</p>
                     </span>
                     <span>
-                        <input type="text" required name="tgl_praktek" />
-                        <input type="number" required name="NoUrut" />
+                        <?php
+                        $arrMonth = [
+                            "January",
+                            "February",
+                            "March",
+                            "April",
+                            "May",
+                            "June",
+                            "July",
+                            "August",
+                            "September",
+                            "October",
+                            "November",
+                            "December"
+                        ];
+                        $d = strtotime("+7 Hours");
+                        $tanggal = date("d", $d) . "-" . $arrMonth[(int)date("m", $d) - 1] . "-" . date("Y", $d);
+                        $noUrut = generateNoUrut($tanggal);
+                        ?>
+                        <input type="text" required name="tgl_praktek" value="<?= $tanggal; ?>" />
+                        <input type="number" required name="NoUrut" value="<?= $noUrut; ?>" />
                     </span>
                 </section>
                 <div style="width: 70%; height: 2px; background-color: gainsboro; margin-block: 1em;"></div>
@@ -352,7 +398,11 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <p>Lain-Lain:</p>
                     </span>
                     <span>
-                        <input type="text" required name="BPJS" />
+                        <select name="BPJS">
+                            <option value="True" selected>Ya</option>
+                            <option value="False">Tidak</option>
+                        </select>
+                        <!-- <input type="text" required name="BPJS" /> -->
                         <input type="number" required value="0" name="Exo_Perm" />
                         <input type="number" required value="0" name="Exo_Susu" />
                         <input type="number" required value="0" name="LC" />
@@ -370,65 +420,11 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         </div>
     </main>
     <script>
-        const tgl = new Date();
-        const arrMonth = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December"
-        ];
-        const str_tgl =
-            tgl.getDate() +
-            "-" +
-            arrMonth[tgl.getMonth()] +
-            "-" +
-            tgl.getFullYear();
-        const str_tgl_my =
-            arrMonth[tgl.getMonth()] +
-            "-" +
-            tgl.getFullYear();
-        document.querySelector('input[name="tgl_praktek"]').value = str_tgl;
-
-        async function generateNoUrut() {
-            const res = await fetch('https://oceria.amagabar.com/api.php?function=generateNoUrut&tgl=' + str_tgl_my);
-            const noUrut = (await res.json()).no_urut;
-            document.querySelector('input[name="NoUrut"]').value = noUrut;
-        }
-        generateNoUrut();
-
         const dataElm = document.querySelectorAll(".data-pasien");
-
-        function prev() {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const pag = Number(urlParams.get('pag'));
-            if (pag > 1) window.location.href = "/inputKunjungan.php?pag=" + (pag - 1);
-        }
-
-        const totalPasien = Number(<?php
-                                    $data_json = file_get_contents("https://oceria.amagabar.com/api.php?function=getStatus");
-                                    $data_status = json_decode($data_json);
-                                    echo $data_status->totalPasien;
-                                    ?>);
-
-        function next() {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const pag = Number(urlParams.get('pag'));
-            if (pag * 25 < totalPasien) window.location.href = "/inputKunjungan.php?pag=" + (pag + 1);
-        }
 
         function pilihData(id) {
             async function getPasien() {
-                const res = await fetch("/api.php?function=getPasien&id=" + id);
+                const res = await fetch("./api.php?function=getPasien&id=" + id);
                 const data = (await res.json()).data;
                 dataElm[0].value = data.ID;
                 dataElm[1].value = data.fullname;

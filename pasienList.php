@@ -150,6 +150,10 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             border-radius: 10px;
         }
 
+        .nav li.active a {
+            font-weight: 700;
+        }
+
         .nav li a {
             padding-inline: 10px;
             text-decoration: none;
@@ -246,9 +250,9 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         <div class="nav">
             <h1><a href="./">Oceria</a></h1>
             <ul>
-                <li><a href="./pasienList.php?pag=1">Patient List</a></li>
+                <li class="active"><a href="./pasienList.php?pag=1">Patient List</a></li>
                 <li><a href="./newPasien.php">New Patient</a></li>
-                <li><a style="color: var(--merah);" href="./actionlogout.php">Logout</a></li>
+                <li class="logout"><a href="./actionlogout.php">Logout</a></li>
             </ul>
             <span style="text-align: right">
                 <p><b>My Dentist</b></p>
