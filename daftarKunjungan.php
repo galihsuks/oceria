@@ -25,11 +25,6 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             box-sizing: border-box;
         }
 
-        header,
-        main {
-            padding-inline: 100px;
-        }
-
         label {
             display: block;
         }
@@ -39,16 +34,30 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             display: block;
         }
 
-        main {
+        body {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            height: 100svh;
         }
 
-        main>.kiri {
-            width: calc(100% - 350px);
+        main {
+            width: 90%;
+            margin-inline: auto;
+            flex-grow: 1;
+            max-height: calc(100% - 125px);
         }
 
-        main>.kanan {
+        header {
+            background-color: whitesmoke;
+        }
+
+        main .kiri {
+            /* flex-grow: 1; */
+            width: calc(100% - 330px);
+            height: 100%;
+        }
+
+        main .kanan {
             width: 330px;
         }
 
@@ -63,7 +72,6 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             color: var(--hitam);
             display: block;
             width: max-content;
-            margin-bottom: 0.5em;
         }
 
         .tombol:hover {
@@ -115,18 +123,13 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             color: gainsboro;
         }
 
-        header {
-            background-color: whitesmoke;
-            display: block;
-            width: 100vw;
-            margin-bottom: 10px;
-        }
-
         .nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             height: 70px;
+            width: 90%;
+            margin-inline: auto;
         }
 
         .nav h1 a {
@@ -170,7 +173,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         .container-tabel {
             display: block;
             overflow: scroll;
-            height: calc(100vh - 250px);
+            width: 100%;
+            height: calc(100% - 70px);
         }
 
         .container-tabel thead tr {
@@ -181,6 +185,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         table {
             border-collapse: collapse;
             text-align: center;
+            width: max-content;
         }
 
         tr:nth-child(even) {
@@ -229,6 +234,11 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             height: 21px;
             margin-block: 4px;
         }
+
+        .container-filter {
+            height: fit-content;
+            padding-block: 0.5em;
+        }
     </style>
     <title>Oceria | Daftar Kunjungan</title>
 </head>
@@ -250,63 +260,67 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             </span>
         </div>
     </header>
+    <div class="container-filter">
+        <form method="get">
+            <div style="display: flex; gap: 0.3em; width: 90%; margin-inline: auto; align-items:center;">
+                <p>Search part of</p>
+                <select name="filter-select">
+                    <option value="tanggal">Tanggal</option>
+                    <option value="ID" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'ID' ? 'selected' : '') : '' ?>>ID Pasien</option>
+                </select>:
+                <input type="text" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
+                <input type="text" name="pag" value="1" style="display: none;">
+                <button class="tombol" type="submit">
+                    Apply
+                </button>
+                <?= isset($_GET['filter-select']) ? '<a href="./daftarKunjungan.php?pag=1" class="tombol">Show All</a>' : '' ?>
+            </div>
+        </form>
+    </div>
     <main>
-        <div class="kiri">
-            <section class="container-isian">
-                <form method="get" style="display: flex; gap: 0.3em">
-                    <p>Search part of</p>
-                    <select name="filter-select">
-                        <option value="tanggal">Tanggal</option>
-                        <option value="ID" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'ID' ? 'selected' : '') : '' ?>>ID Pasien</option>
-                    </select>:
-                    <input type="text" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
-                    <input type="text" name="pag" value="1" style="display: none;">
-                    <button style="font-size: small" type="submit">
-                        Apply
-                    </button>
-                </form>
-            </section>
-            <a href="./daftarKunjungan.php?pag=1" class="tombol">Show All</a>
-            <section style="margin-block: 0.3em">
-                <div class="container-tabel">
-                    <table>
-                        <thead>
-                            <tr style="
+        <div style="display: flex; gap: 20px; height: 100%;">
+            <div class="kiri">
+                <section style="margin-block: 0.3em">
+                    <div class="container-tabel">
+                        <table>
+                            <thead>
+                                <tr style="
                                         background-color: var(--hijau);
                                         color: white;
                                     ">
-                                <th>No. Urut</th>
-                                <th style="min-width: 250px;">Tanggal Kunjungan</th>
-                                <th>ID Pasien</th>
-                                <th>BPJS</th>
-                                <th>Exo_Perm</th>
-                                <th>Exo_Susu</th>
-                                <th>LC</th>
-                                <th>Fuji</th>
-                                <th>Rawat Syaraf</th>
-                                <th>Scalling</th>
-                                <th>Antibiotik</th>
-                                <th>Analgetik</th>
-                                <th>Anti Radang</th>
-                                <th>Lain-Lain</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            include('api.php');
-                            if (isset($_GET['filter-select'])) {
-                                if ($_GET['filter-select'] == "tanggal") {
-                                    $data_pasien_lengkap = getKunjunganTanggal();
-                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
-                                } else if ($_GET['filter-select'] == "ID") {
-                                    $data_pasien_lengkap = getKunjunganId();
+                                    <th>No. Urut</th>
+                                    <th style="min-width: 250px;">Tanggal Kunjungan</th>
+                                    <th>ID Pasien</th>
+                                    <th>BPJS</th>
+                                    <th>Exo_Perm</th>
+                                    <th>Exo_Susu</th>
+                                    <th>LC</th>
+                                    <th>Fuji</th>
+                                    <th>Rawat Syaraf</th>
+                                    <th>Scalling</th>
+                                    <th>Antibiotik</th>
+                                    <th>Analgetik</th>
+                                    <th>Anti Radang</th>
+                                    <th>Lain-Lain</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                include('api.php');
+                                if (isset($_GET['filter-select'])) {
+                                    if ($_GET['filter-select'] == "tanggal") {
+                                        $data_pasien_lengkap = getKunjunganTanggal();
+                                        $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                    } else if ($_GET['filter-select'] == "ID") {
+                                        $data_pasien_lengkap = getKunjunganId();
+                                        $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                    }
+                                } else {
+                                    $data_pasien_lengkap = getAllKunjungan();
                                     $data_pasien = $data_pasien_lengkap['dataLimit'];
                                 }
-                            } else {
-                                $data_pasien = getAllKunjungan();
-                            }
-                            foreach ($data_pasien as $data) {
-                                echo '<tr onclick="pilihData(`' . (str_contains($data->tgl_praktek, ",") ? explode(",", $data->tgl_praktek)[0] : $data->tgl_praktek) . '`,`' . $data->NoUrut . '`)">
+                                foreach ($data_pasien as $data) {
+                                    echo '<tr onclick="pilihData(`' . (str_contains($data->tgl_praktek, ",") ? explode(",", $data->tgl_praktek)[0] : $data->tgl_praktek) . '`,`' . $data->NoUrut . '`)">
                                         <td>' . $data->NoUrut . '</td>
                                         <td>' . $data->tgl_praktek . '</td>
                                         <td>' . $data->ID_pasien . '</td>
@@ -322,86 +336,98 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                                         <td>' . $data->AntiRadang . '</td>
                                         <td>' . $data->Lain_Lain . '</td>
                                         </tr>';
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            <div class="paginasi" style="margin-inline: auto; width: fit-content; display: flex; gap: 5px;">
-                <!-- <button onclick="prev()">Prev</button>
+                                }
+                                $totalKunjungan = count($data_pasien_lengkap['dataAll']);
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <div class="paginasi" style="margin-inline: auto; width: fit-content; display: flex; gap: 5px;">
+                    <!-- <button onclick="prev()">Prev</button>
                 <button onclick="next()">Next</button> -->
-                <?php if (!isset($_GET['filter-select'])) { ?>
-                    <?= $_GET['pag'] > 1 ? '<a class="tombol" href="./daftarKunjungan.php?pag=' . ($_GET['pag'] - 1) . '">Prev</a>' : '' ?>
-                    <?php
-                    $data_status = getStatus();
-                    if ($_GET['pag'] * 25 < $data_status->totalKunjungan) {
-                        echo '<a class="tombol" href="./daftarKunjungan.php?pag=' . ($_GET['pag'] + 1) . '">Next</a>';
-                    }
-                    ?>
-                <?php } else { ?>
-                    <?php
-                    $totalKunjungan = count($data_pasien_lengkap['dataAll']);
-                    if ($_GET['pag'] > 1) {
-                        echo '<a class="tombol" href="./daftarKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] - 1) . '">Prev</a>';
-                    }
-                    if ($_GET['pag'] * 25 < $totalKunjungan) {
-                        echo '<a class="tombol" href="./daftarKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] + 1) . '">Next</a>';
-                    }
-                    ?>
-                <?php } ?>
+                    <?php if (!isset($_GET['filter-select'])) { ?>
+                        <?= $_GET['pag'] > 1 ? '<a class="tombol" href="./daftarKunjungan.php?pag=' . ($_GET['pag'] - 1) . '">Prev</a>' : '' ?>
+                        <?php
+                        $data_status = getStatus();
+                        if ($_GET['pag'] * 25 < $data_status->totalKunjungan) {
+                            echo '<a class="tombol" href="./daftarKunjungan.php?pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                        }
+                        ?>
+                    <?php } else { ?>
+                        <?php
+                        if ($_GET['pag'] > 1) {
+                            echo '<a class="tombol" href="./daftarKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] - 1) . '">Prev</a>';
+                        }
+                        if ($_GET['pag'] * 25 < $totalKunjungan) {
+                            echo '<a class="tombol" href="./daftarKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                        }
+                        ?>
+                    <?php } ?>
+                </div>
             </div>
-        </div>
-        <div class="kanan">
-            <section class="container-isian" style="margin-bottom: 1rem; margin-top: 70px">
-                <span>
-                    <p>NoUrut per Bln:</p>
-                    <p>Tgl. Kunjungan:</p>
-                    <p>Patient's ID:</p>
-                    <p>Patient's Name:</p>
-                    <p>Patient's Address:</p>
-                    <p>BPJS:</p>
-                    <p>Exo Permanen:</p>
-                    <p>Exo Susu</p>
-                    <p>Light Curing (LC):</p>
-                    <p>Fuji:</p>
-                    <p>Perawatan Saraf:</p>
-                    <p>Scalling:</p>
-                    <p>Antibiotik:</p>
-                    <p>Analgetik:</p>
-                    <p>Anti Radang:</p>
-                    <p>Lain-Lain:</p>
-                </span>
-                <span>
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                    <input class="data-pasien" disabled type="text" />
-                </span>
-            </section>
-            <section id="tombol-bawah">
-                <button class="merah" disabled id="delete-button">
-                    Delete
-                </button>
-            </section>
-            <?php
-            // $data_json = file_get_contents("https://oceria.amagabar.com/api.php?function=getStatus");
-            // $data_status = json_decode($data_json);
-            // echo '<h2>Total Records:' . $data_status->totalKunjungan . '</h2>'
-            ?>
-            <?= !isset($_GET['filter-select']) ? '<h2>Total Patients:' . $data_status->totalKunjungan . '</h2>' : '<h2>Total Patients:' . $totalKunjungan . '</h2>' ?>
+            <div class="kanan">
+                <section class="container-isian">
+                    <span>
+                        <p>No.Urut per bulan:</p>
+                        <p>Tgl. Kunjungan:</p>
+                    </span>
+                    <span>
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                    </span>
+                </section>
+                <div style="width: 70%; height: 2px; background-color: gainsboro; margin-block: 1em;"></div>
+                <h2>Pasien</h2>
+                <section class="container-isian">
+                    <span>
+                        <p>ID Pasien:</p>
+                        <p>Nama Pasien:</p>
+                        <p>Alamat Pasien:</p>
+                    </span>
+                    <span>
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                    </span>
+                </section>
+                <div style="width: 70%; height: 2px; background-color: gainsboro; margin-block: 1em;"></div>
+                <h2>Tindakan & Obat</h2>
+                <section class="container-isian" style="margin-bottom: 1rem;">
+                    <span>
+                        <p>BPJS:</p>
+                        <p>Exo Permanen:</p>
+                        <p>Exo Susu:</p>
+                        <p>LC:</p>
+                        <p>Fuji:</p>
+                        <p>Rawat Saraf:</p>
+                        <p>Scalling:</p>
+                        <p>Antibiotik:</p>
+                        <p>Analgetik:</p>
+                        <p>Anti Radang:</p>
+                        <p>Lain-Lain:</p>
+                    </span>
+                    <span>
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                    </span>
+                </section>
+                <section id="tombol-bawah">
+                    <button class="merah" disabled id="delete-button">
+                        Delete
+                    </button>
+                </section>
+                <h2>Total Patients: <?= $totalKunjungan ?></h2>
+            </div>
         </div>
     </main>
     <script>

@@ -25,9 +25,31 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             box-sizing: border-box;
         }
 
-        header,
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100svh;
+        }
+
         main {
-            padding-inline: 100px;
+            width: 90%;
+            margin-inline: auto;
+            flex-grow: 1;
+            max-height: calc(100% - 125px);
+        }
+
+        header {
+            background-color: whitesmoke;
+        }
+
+        main .kiri {
+            /* flex-grow: 1; */
+            width: calc(100% - 330px);
+            height: 100%;
+        }
+
+        main .kanan {
+            width: 330px;
         }
 
         label {
@@ -37,19 +59,6 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         input,
         select {
             display: block;
-        }
-
-        main {
-            display: flex;
-            gap: 20px;
-        }
-
-        main>.kiri {
-            width: calc(100% - 350px);
-        }
-
-        main>.kanan {
-            width: 330px;
         }
 
         .tombol {
@@ -63,7 +72,6 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             color: var(--hitam);
             display: block;
             width: max-content;
-            margin-bottom: 0.5em;
         }
 
         .tombol:hover {
@@ -115,18 +123,13 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             color: gainsboro;
         }
 
-        header {
-            background-color: whitesmoke;
-            display: block;
-            width: 100vw;
-            margin-bottom: 10px;
-        }
-
         .nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             height: 70px;
+            width: 90%;
+            margin-inline: auto;
         }
 
         .nav h1 a {
@@ -170,7 +173,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         .container-tabel {
             display: block;
             overflow: scroll;
-            height: calc(100vh - 250px);
+            width: 100%;
+            height: calc(100% - 70px);
         }
 
         .container-tabel thead tr {
@@ -180,6 +184,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
 
         table {
             border-collapse: collapse;
+            width: max-content;
         }
 
         tr:nth-child(even) {
@@ -229,7 +234,11 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
 
         .container-isian {
             display: flex;
-            gap: 1rem;
+            gap: 0.3em;
+        }
+
+        .container-isian>span {
+            width: 100%;
         }
 
         .container-isian p {
@@ -240,6 +249,12 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         .container-isian select {
             height: 21px;
             margin-block: 4px;
+            max-width: 100%;
+        }
+
+        .container-filter {
+            height: fit-content;
+            padding-block: 0.5em;
         }
     </style>
     <title>Oceria | Patient List</title>
@@ -260,25 +275,27 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             </span>
         </div>
     </header>
+    <div class="container-filter">
+        <form method="get">
+            <div style="display: flex; gap: 0.3em; width: 90%; margin-inline: auto; align-items:center;">
+                <p>Search part of</p>
+                <select name="filter-select">
+                    <option value="fullname">Name</option>
+                    <option value="ID" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'ID' ? 'selected' : '') : '' ?>>ID</option>
+                    <option value="Address" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'Address' ? 'selected' : '') : '' ?>>Address</option>
+                </select>:
+                <input type="text" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
+                <input type="text" name="pag" value="1" style="display: none;">
+                <button class="tombol" type="submit">
+                    Apply
+                </button>
+                <?= isset($_GET['filter-select']) ? '<a href="./pasienList.php?pag=1" class="tombol">Show All</a>' : '' ?>
+            </div>
+        </form>
+    </div>
     <main>
-        <div class="kiri">
-            <section class="container-isian">
-                <form method="get" style="display: flex; gap: 0.3em">
-                    <p>Search part of</p>
-                    <select name="filter-select">
-                        <option value="fullname">Name</option>
-                        <option value="ID" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'ID' ? 'selected' : '') : '' ?>>ID</option>
-                        <option value="Address" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'Address' ? 'selected' : '') : '' ?>>Address</option>
-                    </select>:
-                    <input type="text" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
-                    <input type="text" name="pag" value="1" style="display: none;">
-                    <button style="font-size: small" type="submit">
-                        Apply
-                    </button>
-                </form>
-            </section>
-            <a href="./pasienList.php?pag=1" class="tombol">Show All</a>
-            <section style="margin-block: 0.3em">
+        <div style="display: flex; gap: 20px; height: 100%;">
+            <div class="kiri">
                 <div class="container-tabel">
                     <table>
                         <thead>
@@ -288,7 +305,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                                     ">
                                 <th>No.</th>
                                 <th>ID</th>
-                                <th>Patient's Name</th>
+                                <th>Name</th>
                                 <th>Date of Birth</th>
                                 <th>Address</th>
                                 <th>Sex</th>
@@ -317,9 +334,15 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                                     $data_pasien = $data_pasien_lengkap['dataLimit'];
                                 }
                             } else {
-                                $data_pasien = getAllPasien();
+                                $data_pasien_lengkap = getAllPasien();
+                                $data_pasien = $data_pasien_lengkap['dataLimit'];
                             }
                             $no = ($_GET['pag'] - 1) * 25 + 1;
+                            function shortString($str)
+                            {
+                                if (strlen($str) > 15) return $str = substr($str, 0, 14) . '...';
+                                return $str;
+                            }
                             foreach ($data_pasien as $data) {
                                 echo '<tr onclick="pilihData(`' . $data->ID . '`)">
                                         <td>' . $no . '</td>
@@ -331,7 +354,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                                         <td>' . $data->NoHp . '</td>
                                         <td>' . $data->Job . '</td>
                                         <td>' . $data->status . '</td>
-                                        <td>' . $data->medicalrecord . '</td>
+                                        <td>' . shortString($data->medicalrecord) . '</td>
                                         <td>' . $data->photo . '</td>
                                         <td>' . $data->BPJS . '</td>
                                         <td>' . $data->BloodType . '</td>
@@ -339,86 +362,82 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                                         </tr>';
                                 $no++;
                             }
+                            $totalPasien = count($data_pasien_lengkap['dataAll']);
                             ?>
                         </tbody>
                     </table>
                 </div>
-            </section>
-            <div class="paginasi" style="margin-inline: auto; width: fit-content; display: flex; gap: 5px;">
-                <?php if (!isset($_GET['filter-select'])) { ?>
-                    <?= $_GET['pag'] > 1 ? '<a class="tombol" href="./pasienList.php?pag=' . ($_GET['pag'] - 1) . '">Prev</a>' : '' ?>
-                    <?php
-                    $data_status = getStatus();
-                    if ($_GET['pag'] * 25 < $data_status->totalPasien) {
-                        echo '<a class="tombol" href="./pasienList.php?pag=' . ($_GET['pag'] + 1) . '">Next</a>';
-                    }
-                    ?>
-                <?php } else { ?>
-                    <?php
-                    $totalPasien = count($data_pasien_lengkap['dataAll']);
-                    if ($_GET['pag'] > 1) {
-                        echo '<a class="tombol" href="./pasienList.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] - 1) . '">Prev</a>';
-                    }
-                    if ($_GET['pag'] * 25 < $totalPasien) {
-                        echo '<a class="tombol" href="./pasienList.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] + 1) . '">Next</a>';
-                    }
-                    ?>
-                <?php } ?>
+                <div class="paginasi" style="margin-inline: auto; width: fit-content; display: flex; gap: 5px; margin-top: 5px">
+                    <?php if (!isset($_GET['filter-select'])) { ?>
+                        <?= $_GET['pag'] > 1 ? '<a class="tombol" href="./pasienList.php?pag=' . ($_GET['pag'] - 1) . '">Prev</a>' : '' ?>
+                        <?php
+                        $data_status = getStatus();
+                        if ($_GET['pag'] * 25 < $data_status->totalPasien) {
+                            echo '<a class="tombol" href="./pasienList.php?pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                        }
+                        ?>
+                    <?php } else { ?>
+                        <?php
+                        if ($_GET['pag'] > 1) {
+                            echo '<a class="tombol" href="./pasienList.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] - 1) . '">Prev</a>';
+                        }
+                        if ($_GET['pag'] * 25 < $totalPasien) {
+                            echo '<a class="tombol" href="./pasienList.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                        }
+                        ?>
+                    <?php } ?>
+                </div>
             </div>
-        </div>
-        <div class="kanan">
-            <section>
+            <div class="kanan">
+                <!-- <section>
                 <div class="card" style="margin-bottom: 1rem">
                     <h2>Photo</h2>
                     <img src="pic/nopic.jpg" width="260px" />
                     <p id="photo-id">Photo ID:</p>
-                    <!--<button>Update Photo</button>-->
-                    <!--<button>zoom</button>-->
-                    <!--<button>Set Printer</button>-->
-                    <!--<button class="hijau">Print Card</button>-->
                 </div>
-            </section>
-            <section class="container-isian" style="margin-bottom: 1rem">
-                <span>
-                    <p>Patient's ID:</p>
-                    <p>Sex:</p>
-                    <p>Patient's Name:</p>
-                    <p>Address:</p>
-                    <p>Date of Birth:</p>
-                    <p>Age</p>
-                    <p>Job:</p>
-                    <p>Status:</p>
-                    <p>BPJS Ins.:</p>
-                    <p>No HP:</p>
-                    <p>Blood Type:</p>
-                    <p>NIK:</p>
-                    <p>Medical Rec.:</p>
-                </span>
-                <span>
-                    <input class="data-pasien" disabled type="text" name="ID" />
-                    <input class="data-pasien" disabled type="text" name="sex" />
-                    <input class="data-pasien" disabled type="text" name="fullname" />
-                    <input class="data-pasien" disabled type="text" name="Address" />
-                    <input class="data-pasien" disabled type="text" name="tgl_lahir" />
-                    <input class="data-pasien" disabled type="text" name="age" />
-                    <input class="data-pasien" disabled type="text" name="Job" />
-                    <input class="data-pasien" disabled type="text" name="status" />
-                    <input class="data-pasien" disabled type="text" name="BPJS" />
-                    <input class="data-pasien" disabled type="number" name="NoHp" />
-                    <input class="data-pasien" disabled type="text" name="BloodType" />
-                    <input class="data-pasien" disabled type="number" name="NIK" />
-                    <textarea class="data-pasien" disabled name="medicalrecord" rows="4" cols="24"></textarea>
-                </span>
-            </section>
-            <section id="tombol-bawah">
-                <button class="merah" disabled id="delete-button">Delete</button>
-            </section>
-            <?= !isset($_GET['filter-select']) ? '<h2>Total Patients:' . $data_status->totalPasien . '</h2>' : '<h2>Total Patients:' . $totalPasien . '</h2>' ?>
+            </section> -->
+                <section class="container-isian" style="margin-bottom: 1rem">
+                    <span>
+                        <p>Patient's ID:</p>
+                        <p>Sex:</p>
+                        <p>Name:</p>
+                        <p>Address:</p>
+                        <p>Date of Birth:</p>
+                        <p>Age</p>
+                        <p>Job:</p>
+                        <p>Status:</p>
+                        <p>BPJS Ins.:</p>
+                        <p>No HP:</p>
+                        <p>Blood Type:</p>
+                        <p>NIK:</p>
+                        <p>Medical Rec.:</p>
+                    </span>
+                    <span>
+                        <input class="data-pasien" disabled type="text" name="ID" />
+                        <input class="data-pasien" disabled type="text" name="sex" />
+                        <input class="data-pasien" disabled type="text" name="fullname" />
+                        <input class="data-pasien" disabled type="text" name="Address" />
+                        <input class="data-pasien" disabled type="text" name="tgl_lahir" />
+                        <input class="data-pasien" disabled type="text" name="age" />
+                        <input class="data-pasien" disabled type="text" name="Job" />
+                        <input class="data-pasien" disabled type="text" name="status" />
+                        <input class="data-pasien" disabled type="text" name="BPJS" />
+                        <input class="data-pasien" disabled type="number" name="NoHp" />
+                        <input class="data-pasien" disabled type="text" name="BloodType" />
+                        <input class="data-pasien" disabled type="number" name="NIK" />
+                        <textarea class="data-pasien" disabled name="medicalrecord" rows="4" cols="24"></textarea>
+                    </span>
+                </section>
+                <section id="tombol-bawah">
+                    <button class="merah" disabled id="delete-button">Delete</button>
+                </section>
+                <h2>Total Patients: <?= $totalPasien ?></h2>
+            </div>
         </div>
     </main>
     <script>
-        const imgElm = document.querySelector("img");
-        const photoIdElm = document.querySelector("#photo-id");
+        // const imgElm = document.querySelector("img");
+        // const photoIdElm = document.querySelector("#photo-id");
         const tmbElm = document.querySelector("#tombol-bawah");
         const dataElm = document.querySelectorAll(".data-pasien");
 
@@ -427,7 +446,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 const res = await fetch("./api.php?function=getPasien&id=" + id);
                 const data = (await res.json()).data;
 
-                photoIdElm.innerHTML = data.photo;
+                // photoIdElm.innerHTML = data.photo;
                 dataElm[0].value = data.ID;
                 dataElm[1].value = data.sex;
                 dataElm[2].value = data.fullname;
@@ -448,29 +467,29 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             }
             getPasien();
 
-            function getFoto() {
-                const img = new Image();
-                async function getFotoAsync() {
-                    const res = await fetch("./api.php?function=cekFoto&id=" + id);
-                    const data = (await res.json()).data[0];
-                    if (data) imgElm.src = "./api.php?function=getFoto&id=" + id;
-                    else {
-                        img.src = "pic/pasienLama/" + id + ".jpg";
-                        if (img.complete) {
-                            imgElm.src = "pic/pasienLama/" + id + ".jpg";
-                        } else {
-                            img.onload = () => {
-                                imgElm.src = "pic/pasienLama/" + id + ".jpg";
-                            };
-                            img.onerror = () => {
-                                imgElm.src = "pic/nopic.jpg";
-                            };
-                        }
-                    }
-                }
-                getFotoAsync();
-            }
-            getFoto();
+            // function getFoto() {
+            //     const img = new Image();
+            //     async function getFotoAsync() {
+            //         const res = await fetch("./api.php?function=cekFoto&id=" + id);
+            //         const data = (await res.json()).data[0];
+            //         if (data) imgElm.src = "./api.php?function=getFoto&id=" + id;
+            //         else {
+            //             img.src = "pic/pasienLama/" + id + ".jpg";
+            //             if (img.complete) {
+            //                 imgElm.src = "pic/pasienLama/" + id + ".jpg";
+            //             } else {
+            //                 img.onload = () => {
+            //                     imgElm.src = "pic/pasienLama/" + id + ".jpg";
+            //                 };
+            //                 img.onerror = () => {
+            //                     imgElm.src = "pic/nopic.jpg";
+            //                 };
+            //             }
+            //         }
+            //     }
+            //     getFotoAsync();
+            // }
+            // getFoto();
         }
 
         function deleteData(id) {

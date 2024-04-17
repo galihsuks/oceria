@@ -10,28 +10,36 @@ if (isset($_GET['function'])) {
 function getAllKunjungan()
 {
     global $conn;
-    if (!$_GET['pag']) {
-        $query = $conn->query("SELECT * FROM kunjungan");
-    } else {
-        $offset = ($_GET['pag'] - 1) * 25;
-        $query = $conn->query("SELECT * FROM kunjungan LIMIT 25 OFFSET {$offset}");
+    $queryAll = $conn->query("SELECT * FROM kunjungan");
+
+    $offset = ($_GET['pag'] - 1) * 25;
+    $queryLimit = $conn->query("SELECT * FROM kunjungan LIMIT 25 OFFSET {$offset}");
+
+
+    $dataAll = [];
+    $dataLimit = [];
+    while ($row = mysqli_fetch_object($queryAll)) {
+        $dataAll[] = $row;
     }
-    while ($row = mysqli_fetch_object($query)) {
-        $data[] = $row;
+    while ($row = mysqli_fetch_object($queryLimit)) {
+        $dataLimit[] = $row;
     }
 
-    if ($query) {
+    if ($queryAll || $queryLimit) {
         $res = array(
             'message' => 'Get All Kunjungan Success',
-            'data' => $data
+            'dataAll' => $dataAll,
+            'dataLimit' => $dataLimit
         );
     } else {
         $res = array(
             'message' => 'Get All Kunjungan Failed',
-            'mysqli_error' => mysqli_error($conn)
+            'mysqli_error' => mysqli_error($conn),
+            'dataAll' => [],
+            'dataLimit' => []
         );
     }
-    return $data;
+    return $res;
     // header('Content-Type: application/json');
     // echo json_encode($res);
 }
@@ -221,28 +229,35 @@ function generateNoUrut($tanggal)
 function getAllPasien()
 {
     global $conn;
-    if (!$_GET['pag']) {
-        $query = $conn->query("SELECT * FROM pasien");
-    } else {
-        $offset = ($_GET['pag'] - 1) * 25;
-        $query = $conn->query("SELECT * FROM pasien LIMIT 25 OFFSET {$offset}");
+    $queryAll = $conn->query("SELECT * FROM pasien");
+
+    $offset = ($_GET['pag'] - 1) * 25;
+    $queryLimit = $conn->query("SELECT * FROM pasien LIMIT 25 OFFSET {$offset}");
+
+    $dataAll = [];
+    $dataLimit = [];
+    while ($row = mysqli_fetch_object($queryAll)) {
+        $dataAll[] = $row;
     }
-    while ($row = mysqli_fetch_object($query)) {
-        $data[] = $row;
+    while ($row = mysqli_fetch_object($queryLimit)) {
+        $dataLimit[] = $row;
     }
 
-    if ($query) {
+    if ($queryAll || $queryLimit) {
         $res = array(
             'message' => 'Get All Pasien Success',
-            'data' => $data
+            'dataAll' => $dataAll,
+            'dataLimit' => $dataLimit
         );
     } else {
         $res = array(
             'message' => 'Get All Pasien Failed',
-            'mysqli_error' => mysqli_error($conn)
+            'mysqli_error' => mysqli_error($conn),
+            'dataAll' => [],
+            'dataLimit' => []
         );
     }
-    return $data;
+    return $res;
     // header('Content-Type: application/json');
     // echo json_encode($res);
 }
@@ -280,7 +295,6 @@ function getPasienNama()
     if (!empty($_GET["filter"])) {
         $nama = $_GET["filter"];
     }
-    // $query = $conn->query("SELECT * FROM pasien WHERE fullname LIKE '%$nama%'");
     $queryAll = $conn->query("SELECT * FROM pasien WHERE fullname LIKE '%$nama%'");
 
     $offset = ($_GET['pag'] - 1) * 25;
