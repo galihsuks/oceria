@@ -352,7 +352,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             </div>
             <div class="kanan">
                 <form method="post" action="./api.php?function=addKunjungan">
-                    <section class="container-isian" style="margin-top: 40px">
+                    <section class="container-isian">
                         <span>
                             <p>Tgl. Kunjungan:</p>
                             <p>No.Urut per bulan:</p>
@@ -381,9 +381,9 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <input type="number" required name="NoUrut" value="<?= $noUrut; ?>" />
                         </span>
                     </section>
-                    <div style="width: 70%; height: 2px; background-color: gainsboro; margin-block: 1em;"></div>
-                    <h2>Pasien</h2>
-                    <p style="color: grey;">Pilih pasien pada tabel disamping untuk mengisi data pasien secara otomatis</p>
+                    <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                    <h3>Pasien</h3>
+                    <p style="color: grey; font-size: small;">Pilih pasien disamping untuk pengisian otomatis</p>
                     <section class="container-isian">
                         <span>
                             <p>Patient's ID:</p>
@@ -396,9 +396,9 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <input class="data-pasien" disabled type="text" required />
                         </span>
                     </section>
-                    <div style="width: 70%; height: 2px; background-color: gainsboro; margin-block: 1em;"></div>
-                    <h2>Tindakan & Obat</h2>
-                    <section class="container-isian" style="margin-bottom: 1rem;">
+                    <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                    <h3>Tindakan & Obat</h3>
+                    <section class="container-isian" style="margin-bottom: 0.5em;">
                         <span>
                             <p>BPJS:</p>
                             <p>Exo Permanen:</p>

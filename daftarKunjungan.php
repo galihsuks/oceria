@@ -377,8 +377,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <input class="data-pasien" disabled type="text" />
                     </span>
                 </section>
-                <div style="width: 70%; height: 2px; background-color: gainsboro; margin-block: 1em;"></div>
-                <h2>Pasien</h2>
+                <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                <h3>Pasien</h3>
                 <section class="container-isian">
                     <span>
                         <p>ID Pasien:</p>
@@ -391,8 +391,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <input class="data-pasien" disabled type="text" />
                     </span>
                 </section>
-                <div style="width: 70%; height: 2px; background-color: gainsboro; margin-block: 1em;"></div>
-                <h2>Tindakan & Obat</h2>
+                <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                <h3>Tindakan & Obat</h3>
                 <section class="container-isian" style="margin-bottom: 1rem;">
                     <span>
                         <p>BPJS:</p>
