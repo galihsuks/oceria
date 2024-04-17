@@ -26,6 +26,12 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             box-sizing: border-box;
         }
 
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100svh;
+        }
+
         header {
             display: flex;
             flex-direction: column;
@@ -38,7 +44,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
 
         main {
             padding-inline: 2em;
-            /* font-size: small; */
+            flex-grow: 1;
         }
 
         footer {
