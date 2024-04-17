@@ -598,6 +598,7 @@ function getAllAntrian()
 {
     global $conn;
     $query = $conn->query("SELECT * FROM antrian");
+    $data = [];
     while ($row = mysqli_fetch_object($query)) {
         $data[] = $row;
     }
@@ -621,8 +622,12 @@ function addAntrian()
     $d = strtotime("+7 Hours");
     $tanggal = date("H:i:s", $d);
     if ($_GET['nama']) {
-        $query = $conn->query("INSERT INTO antrian (waktu, pasien, status) VALUES ('$tanggal', '{$_GET['nama']}', 'Mengantri')");
-        header("location: ./antrian.php?pag=1");
+        $conn->query("INSERT INTO antrian (waktu, pasien, status) VALUES ('$tanggal', '{$_GET['nama']}', 'Mengantri')");
+        if (isset($_GET['filter-select'])) {
+            header("location: ./antrian.php?filter-select=" . $_GET['filter-select'] . "&filter=" . $_GET['filter'] . "&pag=" . $_GET['pag']);
+        } else {
+            header("location: ./antrian.php?pag=" . $_GET['pag']);
+        }
     }
 }
 function updateAntrian()

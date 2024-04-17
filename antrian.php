@@ -1,4 +1,5 @@
 <?php
+include('api.php');
 session_start();
 if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
     header('Location: ./login.php');
@@ -173,18 +174,18 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 <div>
                     <p>Status dokter</p>
                     <select name="isDokter">
-                        <option value="0">Belum Hadir</option>
-                        <option value="1">Sudah Hadir</option>
+                        <option value="0" <?= getStatus()->isDokter ? '' : 'selected'; ?>>Belum Hadir</option>
+                        <option value="1" <?= getStatus()->isDokter ? 'selected' : ''; ?>>Sudah Hadir</option>
                     </select>
                 </div>
                 <div>
                     <p>Status Antrian</p>
                     <select name="isOpen">
-                        <option value="0">Antrian tidak dibuka</option>
-                        <option value="1">Antrian dibuka</option>
+                        <option value="0" <?= getStatus()->isOpen ? '' : 'selected'; ?>>Antrian tidak dibuka</option>
+                        <option value="1" <?= getStatus()->isOpen ? 'selected' : ''; ?>>Antrian dibuka</option>
                     </select>
                 </div>
-                <a href="/api.php?function=hapusAllAntrian">
+                <a href="./api.php?function=hapusAllAntrian">
                     <button>Hapus Semua Antrian</button>
                 </a>
             </div>
@@ -199,11 +200,12 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 <form method="get" style="display: flex; gap: 0.3em">
                     <p>Search part of</p>
                     <select name="filter-select">
-                        <option value="fullname">Fullname</option>
-                        <option value="ID">ID Pasien</option>
-                        <option value="Address">Address</option>
+                        <option value="fullname">Name</option>
+                        <option value="ID" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'ID' ? 'selected' : '') : '' ?>>ID</option>
+                        <option value="Address" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'Address' ? 'selected' : '') : '' ?>>Address</option>
                     </select>:
-                    <input type="text" name="filter" />
+                    <input type="text" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
+                    <input type="text" name="pag" value="1" style="display: none;">
                     <button style="font-size: small" type="submit">
                         Apply
                     </button>
@@ -224,25 +226,30 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         </thead>
                         <tbody>
                             <?php
-                            include('api.php');
-                            if ($_GET['filter-select'] == "fullname") {
-                                $data_pasien = getPasienNama();
-                            } else if ($_GET['filter-select'] == "ID") {
-                                $data_pasien = getPasienId();
-                            } else if ($_GET['filter-select'] == "Address") {
-                                $data_pasien = getPasienAddress();
+                            if (isset($_GET['filter-select'])) {
+                                if ($_GET['filter-select'] == "fullname") {
+                                    $data_pasien_lengkap = getPasienNama();
+                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                } else if ($_GET['filter-select'] == "ID") {
+                                    $data_pasien_lengkap = getPasienId();
+                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                } else if ($_GET['filter-select'] == "Address") {
+                                    $data_pasien_lengkap = getPasienAddress();
+                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
+                                }
                             } else {
-                                $data_pasien = getAllPasien();
+                                $data_pasien_lengkap = getAllPasien();
+                                $data_pasien = $data_pasien_lengkap['dataLimit'];
                             }
-                            if (!$_GET['filter-select']) $no = ($_GET['pag'] - 1) * 25 + 1;
-                            else $no = 1;
+                            $totalPasien = count($data_pasien_lengkap['dataAll']);
+                            $no = ($_GET['pag'] - 1) * 25 + 1;
                             foreach ($data_pasien as $data) {
                                 echo '<tr>
                                         <td>' . $no . '</td>
                                         <td>' . $data->ID . '</td>
                                         <td>' . $data->fullname . '</td>
                                         <td>' . $data->Address . '</td>
-                                        <td><a href="/api.php?function=addAntrian&nama=' . $data->fullname . '" class="tombol">Antri</a></td>
+                                        <td><a href="./api.php?function=addAntrian&nama=' . $data->fullname . '&pag=' . $_GET['pag'] . (isset($_GET['filter-select']) ? '&filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] : '') . '" class="tombol">Antri</a></td>
                                         </tr>';
                                 $no++;
                             }
@@ -250,9 +257,25 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         </tbody>
                     </table>
                 </div>
-                <div class="paginasi" style="margin-inline: auto; width: fit-content">
-                    <button onclick="prev()">Prev</button>
-                    <button onclick="next()">Next</button>
+                <div class="paginasi" style="margin-inline: auto; width: fit-content; display: flex; gap: 5px; margin-top: 5px">
+                    <?php if (!isset($_GET['filter-select'])) { ?>
+                        <?= $_GET['pag'] > 1 ? '<a class="tombol" href="./antrian.php?pag=' . ($_GET['pag'] - 1) . '">Prev</a>' : '' ?>
+                        <?php
+                        $data_status = getStatus();
+                        if ($_GET['pag'] * 25 < $data_status->totalPasien) {
+                            echo '<a class="tombol" href="./antrian.php?pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                        }
+                        ?>
+                    <?php } else { ?>
+                        <?php
+                        if ($_GET['pag'] > 1) {
+                            echo '<a class="tombol" href="./antrian.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] - 1) . '">Prev</a>';
+                        }
+                        if ($_GET['pag'] * 25 < $totalPasien) {
+                            echo '<a class="tombol" href="./antrian.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] + 1) . '">Next</a>';
+                        }
+                        ?>
+                    <?php } ?>
                 </div>
             </div>
             <div class="container-tabel">
@@ -272,8 +295,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         $getAllAntrian = getAllAntrian();
                         foreach ($getAllAntrian as $data) {
                             if ($data->status == 'Mengantri') {
-                                $button = '<a href="/api.php?function=updateAntrian&waktu=' . $data->waktu . '" class="tombol">Selesai</a>
-                                                  <a href="/api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
+                                $button = '<a href="./api.php?function=updateAntrian&waktu=' . $data->waktu . '" class="tombol">Selesai</a>
+                                                  <a href="./api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
                                 $tr = '<tr>';
                             } else {
                                 $button = $data->status;
@@ -291,34 +314,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         </section>
     </main>
     <footer>
-        <p style="font-weight: bold" id="tanggal">None</p>
-    </footer>
-    <script>
-        const isOpenElm = document.querySelector('select[name="isOpen"]');
-        const isDokterElm = document.querySelector('select[name="isDokter"]');
-
-        isOpenElm.addEventListener("change", (e) => {
-            fetch("/api.php?function=updateOpen&status=" + e.target.value);
-            if (e.target.value == '1') isOpenElm.classList.add("select-hijau");
-            else isOpenElm.classList.remove("select-hijau");
-        });
-        isDokterElm.addEventListener("change", (e) => {
-            fetch("/api.php?function=updateDokter&status=" + e.target.value);
-            if (e.target.value == '1') isDokterElm.classList.add("select-hijau");
-            else isDokterElm.classList.remove("select-hijau");
-        });
-
-        const tgl = new Date();
-        const arrDay = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday"
-        ];
-        const arrMonth = [
+        <?php
+        $arrMonth = [
             "January",
             "February",
             "March",
@@ -332,35 +329,25 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             "November",
             "December"
         ];
-        const str_tgl = arrDay[tgl.getDay()] + ", " + tgl.getDate() + " " + arrMonth[tgl.getMonth()] + " " + tgl.getFullYear();
-        document.getElementById("tanggal").innerHTML = str_tgl;
+        $d = strtotime("+7 Hours");
+        $tanggal = date("l", $d) . ", " . date("d", $d) . " " . $arrMonth[(int)date("m", $d) - 1] . " " . date("Y", $d);
+        ?>
+        <p style="font-weight: bold"><?= $tanggal; ?></p>
+    </footer>
+    <script>
+        const isOpenElm = document.querySelector('select[name="isOpen"]');
+        const isDokterElm = document.querySelector('select[name="isDokter"]');
 
-        //ambil dari database
-        let totalPasien = 0;
-        async function getStatus() {
-            const res = await fetch("/api.php?function=getStatus");
-            const data = await res.json();
-            totalPasien = data.totalPasien;
-            isDokterElm.value = data.isDokter;
-            isOpenElm.value = data.isOpen;
-            if (data.isDokter == '1') isDokterElm.classList.add("select-hijau");
-            if (data.isOpen == '1') isOpenElm.classList.add("select-hijau");
-        }
-        getStatus();
-
-        function prev() {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const pag = Number(urlParams.get('pag'));
-            if (pag > 1) window.location.href = "/antrian.php?pag=" + (pag - 1);
-        }
-
-        function next() {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const pag = Number(urlParams.get('pag'));
-            if (pag * 25 < totalPasien) window.location.href = "/antrian.php?pag=" + (pag + 1);
-        }
+        isOpenElm.addEventListener("change", (e) => {
+            fetch("./api.php?function=updateOpen&status=" + e.target.value);
+            if (e.target.value == '1') isOpenElm.classList.add("select-hijau");
+            else isOpenElm.classList.remove("select-hijau");
+        });
+        isDokterElm.addEventListener("change", (e) => {
+            fetch("./api.php?function=updateDokter&status=" + e.target.value);
+            if (e.target.value == '1') isDokterElm.classList.add("select-hijau");
+            else isDokterElm.classList.remove("select-hijau");
+        });
     </script>
 </body>
 
