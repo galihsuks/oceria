@@ -388,12 +388,28 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <span>
                             <p>Patient's ID:</p>
                             <p>Patient's Name:</p>
-                            <p>Patient's Address:</p>
+                            <p>Address:</p>
                         </span>
                         <span>
-                            <input class="data-pasien" type="text" required name="ID_pasien" />
-                            <input class="data-pasien" disabled type="text" required />
-                            <input class="data-pasien" disabled type="text" required />
+                            <input class="data-pasien" type="text" required name="ID_pasien" value="<?= isset($_GET['id']) ? $_GET['id'] : '' ?>" />
+                            <input class="data-pasien" disabled type="text" required value="<?= isset($_GET['nama']) ? $_GET['nama'] : '' ?>" />
+                            <input class="data-pasien" disabled type="text" required value="<?= isset($_GET['alamat']) ? $_GET['alamat'] : '' ?>" />
+                        </span>
+                    </section>
+                    <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                    <h3>Pemeriksaan</h3>
+                    <section class="container-isian">
+                        <span>
+                            <p>Tensi:</p>
+                            <p>Berat Badan:</p>
+                            <p>Tinggi Badan:</p>
+                            <p>Suhu Badan:</p>
+                        </span>
+                        <span>
+                            <input class="data-pasien" type="number" required name="tensi" value="<?= isset($_GET['tensi']) ? $_GET['tensi'] : '' ?>" />
+                            <input class="data-pasien" type="number" required name="berat" value="<?= isset($_GET['berat']) ? $_GET['berat'] : '' ?>" />
+                            <input class="data-pasien" type="number" required name="tinggi" value="<?= isset($_GET['tinggi']) ? $_GET['tinggi'] : '' ?>" />
+                            <input class="data-pasien" type="number" required name="suhu" value="<?= isset($_GET['suhu']) ? $_GET['suhu'] : '' ?>" />
                         </span>
                     </section>
                     <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
@@ -405,7 +421,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <p>Exo Susu</p>
                             <p>Light Curing (LC):</p>
                             <p>Fuji:</p>
-                            <p>Perawatan Saraf:</p>
+                            <p>Rawat Saraf:</p>
                             <p>Scalling:</p>
                             <p>Antibiotik:</p>
                             <p>Analgetik:</p>
@@ -445,6 +461,10 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 dataElm[0].value = data.ID;
                 dataElm[1].value = data.fullname;
                 dataElm[2].value = data.Address;
+                dataElm[3].value = '0';
+                dataElm[4].value = '0';
+                dataElm[5].value = '0';
+                dataElm[6].value = '0';
             }
             getPasien();
         }

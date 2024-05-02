@@ -84,6 +84,12 @@
             color: white;
             border: 2px solid var(--hijau);
         }
+
+        @media (max-width: 600px) {
+            .show-ke-hide {
+                display: none;
+            }
+        }
     </style>
     <title>Oceria</title>
 </head>

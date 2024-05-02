@@ -76,6 +76,16 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             color: var(--putih);
         }
 
+        button.hijau {
+            background-color: var(--hijau);
+            color: white;
+        }
+
+        button:hover.hijau {
+            background-color: whitesmoke;
+            color: black;
+        }
+
         .tombol {
             padding: 0.3em;
             border: none;
@@ -146,6 +156,37 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         .hide {
             display: none;
         }
+
+        .container-form {
+            display: none;
+            position: fixed;
+            height: 100svh;
+            width: 100vw;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+        }
+
+        .container-form.show {
+            display: flex;
+        }
+
+        .container-isian {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .container-isian p {
+            line-height: 25px;
+        }
+
+        .container-isian input,
+        .container-isian select {
+            display: block;
+            height: 21px;
+            margin-block: 4px;
+        }
     </style>
     <title>Oceria | Antrian Pasien</title>
 </head>
@@ -198,11 +239,10 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         </section>
         <section class="content">
             <div style="border-top: 1px solid gainsboro; padding: 1em">
-                <h3>Daftar Antrian</h3>
-                <label>
-                    Pasien Baru
-                    <input type="checkbox" name="cek" />
-                </label>
+                <div style="display: flex; justify-content: space-between;">
+                    <h3>Daftar Antrian</h3>
+                    <a href="./newPasien.php"><button>Pasien Baru</button></a>
+                </div>
                 <form method="get" style="display: flex; gap: 0.3em">
                     <p>Search part of</p>
                     <select name="filter-select">
@@ -249,17 +289,17 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             }
                             $totalPasien = count($data_pasien_lengkap['dataAll']);
                             $no = ($_GET['pag'] - 1) * 25 + 1;
-                            foreach ($data_pasien as $data) {
-                                echo '<tr>
-                                        <td>' . $no . '</td>
-                                        <td>' . $data->ID . '</td>
-                                        <td>' . $data->fullname . '</td>
-                                        <td>' . $data->Address . '</td>
-                                        <td><a href="./api.php?function=addAntrian&nama=' . $data->fullname . '&pag=' . $_GET['pag'] . (isset($_GET['filter-select']) ? '&filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] : '') . '" class="tombol">Antri</a></td>
-                                        </tr>';
+                            foreach ($data_pasien as $data) { ?>
+                                <tr>
+                                    <td><?= $no ?></td>
+                                    <td><?= $data->ID ?></td>
+                                    <td><?= $data->fullname ?></td>
+                                    <td><?= $data->Address ?></td>
+                                    <td><button class="tombol" onclick="showForm('<?= $data->ID ?>', '<?= $data->fullname ?>', '<?= $data->Address ?>')">Antri</button></td>
+                                </tr>
+                            <?php
                                 $no++;
-                            }
-                            ?>
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -305,11 +345,12 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                                                   <a href="./api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
                                 $tr = '<tr>';
                             } else {
-                                $button = $data->status;
+                                $button = '<a class="tombol" href="./inputKunjungan.php?pag=1&id=' . $data->id_pasien . '&nama=' . $data->nama_pasien . '&alamat=' . $data->alamat_pasien . '&tensi=' . $data->tensi . '&berat=' . $data->berat . '&tinggi=' . $data->tinggi . '&suhu=' . $data->suhu . '">Tambahkan Kunjungan</a>
+                                                <a href="./api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
                                 $tr = '<tr class="teks-hijau">';
                             }
                             echo $tr . '<td>' . $data->waktu . '</td>
-                                    <td>' . $data->pasien . '</td>
+                                    <td>' . $data->nama_pasien . '</td>
                                     <td>' . $button . '</td>
                                     </tr>';
                         }
@@ -318,6 +359,44 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 </table>
             </div>
         </section>
+        <div class="container-form" id="container-add-antrian">
+            <div style="width: fit-content; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.5); padding: 1em; border-radius: 1em">
+                <form action="./api.php?function=addAntrian&pag=<?= $_GET['pag'] . (isset($_GET['filter-select']) ? '&filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] : '') ?>" method="post">
+                    <h3>Identitas Pasien</h3>
+                    <section class="container-isian" style="margin-bottom: 0.5em;">
+                        <span>
+                            <p>ID Pasien:</p>
+                            <p>Nama:</p>
+                            <p>Alamat:</p>
+                        </span>
+                        <span>
+                            <input type="text" required name="id" />
+                            <input type="text" required name="nama" />
+                            <input type="text" required name="alamat" />
+                        </span>
+                    </section>
+                    <h3>Pemeriksaan</h3>
+                    <section class="container-isian" style="margin-bottom: 0.5em;">
+                        <span>
+                            <p>Tensi:</p>
+                            <p>Berat Badan:</p>
+                            <p>Tinggi Badan:</p>
+                            <p>Suhu Badan:</p>
+                        </span>
+                        <span>
+                            <input type="number" required name="tensi" />
+                            <input type="number" required name="berat" />
+                            <input type="number" required name="tinggi" />
+                            <input type="number" required name="suhu" />
+                        </span>
+                    </section>
+                    <div style="width: 100%; display: flex; justify-content:center; margin-top: 1em; gap: 0.3em">
+                        <button class="hijau" type="submit">Tambah</button>
+                        <button type="button" onclick="closeForm()">Batal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </main>
     <footer>
         <?php
@@ -343,6 +422,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
     <script>
         const isOpenElm = document.querySelector('select[name="isOpen"]');
         const isDokterElm = document.querySelector('select[name="isDokter"]');
+        const containerAddAntrianElm = document.getElementById("container-add-antrian");
+        const containerAddKunjunganElm = document.getElementById("container-add-kunjungan");
 
         isOpenElm.addEventListener("change", (e) => {
             fetch("./api.php?function=updateOpen&status=" + e.target.value);
@@ -354,6 +435,17 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             if (e.target.value == '1') isDokterElm.classList.add("select-hijau");
             else isDokterElm.classList.remove("select-hijau");
         });
+
+        function showForm(idPasien, namaPasien, alamatPasien) {
+            containerAddAntrianElm.classList.add("show");
+            document.querySelector('input[name="id"]').value = idPasien
+            document.querySelector('input[name="nama"]').value = namaPasien
+            document.querySelector('input[name="alamat"]').value = alamatPasien
+        }
+
+        function closeForm() {
+            containerAddAntrianElm.classList.remove("show")
+        }
     </script>
 </body>
 

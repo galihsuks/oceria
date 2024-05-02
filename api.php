@@ -171,7 +171,7 @@ function delKunjungan()
 function addKunjungan()
 {
     global $conn;
-    $query = $conn->query("INSERT INTO kunjungan (NoUrut, tgl_praktek, ID_pasien, BPJS, Exo_Perm, Exo_Susu, LC, Fuji, RawatSyaraf, Scalling, Antibiotik, Analgetik, AntiRadang, Lain_Lain) VALUES ('{$_POST['NoUrut']}','{$_POST['tgl_praktek']}','{$_POST['ID_pasien']}','{$_POST['BPJS']}','{$_POST['Exo_Perm']}','{$_POST['Exo_Susu']}','{$_POST['LC']}','{$_POST['Fuji']}','{$_POST['RawatSyaraf']}','{$_POST['Scalling']}','{$_POST['Antibiotik']}','{$_POST['Analgetik']}','{$_POST['AntiRadang']}','{$_POST['Lain_Lain']}')");
+    $query = $conn->query("INSERT INTO kunjungan (NoUrut, tgl_praktek, ID_pasien, BPJS, Exo_Perm, Exo_Susu, LC, Fuji, RawatSyaraf, Scalling, Antibiotik, Analgetik, AntiRadang, Lain_Lain, tensi, berat, tinggi, suhu) VALUES ('{$_POST['NoUrut']}','{$_POST['tgl_praktek']}','{$_POST['ID_pasien']}','{$_POST['BPJS']}','{$_POST['Exo_Perm']}','{$_POST['Exo_Susu']}','{$_POST['LC']}','{$_POST['Fuji']}','{$_POST['RawatSyaraf']}','{$_POST['Scalling']}','{$_POST['Antibiotik']}','{$_POST['Analgetik']}','{$_POST['AntiRadang']}','{$_POST['Lain_Lain']}','{$_POST['tensi']}','{$_POST['berat']}','{$_POST['tinggi']}','{$_POST['suhu']}')");
     if ($query) {
         $res = array(
             'message' => 'Insert Kunjungan Success'
@@ -621,8 +621,8 @@ function addAntrian()
     global $conn;
     $d = strtotime("+7 Hours");
     $tanggal = date("H:i:s", $d);
-    if ($_GET['nama']) {
-        $conn->query("INSERT INTO antrian (waktu, pasien, status) VALUES ('$tanggal', '{$_GET['nama']}', 'Mengantri')");
+    if ($_POST['nama']) {
+        $conn->query("INSERT INTO antrian (waktu, id_pasien, nama_pasien, alamat_pasien, tensi, berat, tinggi, suhu, status) VALUES ('$tanggal', '{$_POST['id']}', '{$_POST['nama']}', '{$_POST['alamat']}', '{$_POST['tensi']}', '{$_POST['berat']}', '{$_POST['tinggi']}', '{$_POST['suhu']}', 'Mengantri')");
         if (isset($_GET['filter-select'])) {
             header("location: ./antrian.php?filter-select=" . $_GET['filter-select'] . "&filter=" . $_GET['filter'] . "&pag=" . $_GET['pag']);
         } else {

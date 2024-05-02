@@ -1,0 +1,19 @@
+https://www.rebasedata.com/
+login sek baru convert
+
+tabel kunjungan:
+ID rename ID_pasien dengan varchar 10
+umum drop
+
+tabel pasien:
+ID1 hapus
+ID jadikan primary key "ALTER TABLE pasien ADD PRIMARY KEY(ID)"
+medicalrecord ganti dgn varchar 252
+tambah NIK
+yg ID nya diganti:
+S209 (Setyorini) ganti S2021
+J072 (Juminten) ganti J199
+J176 Juhaina hapus yg nggk lengkap
+
+
+<td><a href="./api.php?function=addAntrian&nama=' . $data->fullname . '&pag=' . $_GET['pag'] . (isset($_GET['filter-select']) ? '&filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] : '') . '" class="tombol">Antri</a></td>

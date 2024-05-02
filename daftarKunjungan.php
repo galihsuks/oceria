@@ -392,6 +392,22 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                     </span>
                 </section>
                 <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                <h3>Pemeriksaan</h3>
+                <section class="container-isian">
+                    <span>
+                        <p>Tensi:</p>
+                        <p>Berat Badan:</p>
+                        <p>Tinggi Badan:</p>
+                        <p>Suhu Badan:</p>
+                    </span>
+                    <span>
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                    </span>
+                </section>
+                <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
                 <h3>Tindakan & Obat</h3>
                 <section class="container-isian" style="margin-bottom: 1rem;">
                     <span>
@@ -444,20 +460,27 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
 
                 dataElm[0].value = dataKun.NoUrut;
                 dataElm[1].value = dataKun.tgl_praktek;
+
                 dataElm[2].value = dataKun.ID_pasien;
                 dataElm[3].value = dataPasien.fullname;
                 dataElm[4].value = dataPasien.Address;
-                dataElm[5].value = dataKun.BPJS;
-                dataElm[6].value = dataKun.Exo_Perm;
-                dataElm[7].value = dataKun.Exo_Susu;
-                dataElm[8].value = dataKun.LC;
-                dataElm[9].value = dataKun.Fuji;
-                dataElm[10].value = dataKun.RawatSyaraf;
-                dataElm[11].value = dataKun.Scalling;
-                dataElm[12].value = dataKun.Antibiotik;
-                dataElm[13].value = dataKun.Analgetik;
-                dataElm[14].value = dataKun.AntiRadang;
-                dataElm[15].value = dataKun.Lain_Lain;
+
+                dataElm[5].value = dataKun.tensi;
+                dataElm[6].value = dataKun.berat;
+                dataElm[7].value = dataKun.tinggi;
+                dataElm[8].value = dataKun.suhu;
+
+                dataElm[9].value = dataKun.BPJS;
+                dataElm[10].value = dataKun.Exo_Perm;
+                dataElm[11].value = dataKun.Exo_Susu;
+                dataElm[12].value = dataKun.LC;
+                dataElm[13].value = dataKun.Fuji;
+                dataElm[14].value = dataKun.RawatSyaraf;
+                dataElm[15].value = dataKun.Scalling;
+                dataElm[16].value = dataKun.Antibiotik;
+                dataElm[17].value = dataKun.Analgetik;
+                dataElm[18].value = dataKun.AntiRadang;
+                dataElm[19].value = dataKun.Lain_Lain;
 
                 tmbElm.innerHTML = `<button class="merah" onclick="deleteData('${tgl}','${urut}')">Delete</button>`;
             }
