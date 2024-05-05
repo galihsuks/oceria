@@ -75,11 +75,44 @@ function getKunjunganTanggal()
     global $conn;
     if (!empty($_GET["filter"])) {
         $tanggal = $_GET["filter"];
+        $hari = explode("-", $tanggal)[2];
+        $bulan = (int)explode("-", $tanggal)[1];
+        $tahun = explode("-", $tanggal)[0];
     }
-    $queryAll = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggal%'");
+    $arrMonthIng = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
+    $arrMonthInd = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "Nopember",
+        "Desember"
+    ];
+    $tanggalQuery1 = $hari . "-" . $arrMonthIng[$bulan - 1] . "-" . $tahun;
+    $tanggalQuery2 = $hari . "-" . $arrMonthInd[$bulan - 1] . "-" . $tahun;
+    $queryAll = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggalQuery1%' OR tgl_praktek LIKE '%$tanggalQuery2%'");
 
     $offset = ($_GET['pag'] - 1) * 25;
-    $queryLimit = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggal%' LIMIT 25 OFFSET {$offset}");
+    $queryLimit = $conn->query("SELECT * FROM kunjungan WHERE tgl_praktek LIKE '%$tanggalQuery1%' OR tgl_praktek LIKE '%$tanggalQuery2%' LIMIT 25 OFFSET {$offset}");
 
     $dataAll = [];
     $dataLimit = [];

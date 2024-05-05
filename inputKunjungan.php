@@ -406,7 +406,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <p>Suhu Badan:</p>
                         </span>
                         <span>
-                            <input class="data-pasien" type="number" required name="tensi" value="<?= isset($_GET['tensi']) ? $_GET['tensi'] : '' ?>" />
+                            <input class="data-pasien" type="text" required name="tensi" value="<?= isset($_GET['tensi']) ? $_GET['tensi'] : '' ?>" />
                             <input class="data-pasien" type="number" required name="berat" value="<?= isset($_GET['berat']) ? $_GET['berat'] : '' ?>" />
                             <input class="data-pasien" type="number" required name="tinggi" value="<?= isset($_GET['tinggi']) ? $_GET['tinggi'] : '' ?>" />
                             <input class="data-pasien" type="number" required name="suhu" value="<?= isset($_GET['suhu']) ? $_GET['suhu'] : '' ?>" />
@@ -443,7 +443,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <input type="number" required value="0" name="Antibiotik" />
                             <input type="number" required value="0" name="Analgetik" />
                             <input type="number" required value="0" name="AntiRadang" />
-                            <input type="text" name="Lain_Lain" />
+                            <!-- <input type="text" name="Lain_Lain" /> -->
+                            <textarea name="Lain_Lain" style="width: 100%;"></textarea>
                         </span>
                     </section>
                     <button type="submit">Save</button>

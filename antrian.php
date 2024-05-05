@@ -384,7 +384,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <p>Suhu Badan:</p>
                         </span>
                         <span>
-                            <input type="number" required name="tensi" />
+                            <input type="text" required name="tensi" />
                             <input type="number" required name="berat" />
                             <input type="number" required name="tinggi" />
                             <input type="number" required name="suhu" />

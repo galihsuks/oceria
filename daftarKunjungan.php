@@ -264,11 +264,11 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         <form method="get">
             <div style="display: flex; gap: 0.3em; width: 90%; margin-inline: auto; align-items:center;">
                 <p>Search part of</p>
-                <select name="filter-select">
+                <select name="filter-select" onchange="changeFilter(event)">
                     <option value="tanggal">Tanggal</option>
                     <option value="ID" <?= isset($_GET['filter-select']) ? ($_GET['filter-select'] == 'ID' ? 'selected' : '') : '' ?>>ID Pasien</option>
                 </select>:
-                <input type="text" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
+                <input type="date" name="filter" value="<?= isset($_GET['filter-select']) ? $_GET['filter'] : '' ?>" />
                 <input type="text" name="pag" value="1" style="display: none;">
                 <button class="tombol" type="submit">
                     Apply
@@ -434,7 +434,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <input class="data-pasien" disabled type="text" />
                         <input class="data-pasien" disabled type="text" />
                         <input class="data-pasien" disabled type="text" />
-                        <input class="data-pasien" disabled type="text" />
+                        <!-- <input class="data-pasien" disabled type="text" /> -->
+                        <textarea class="data-pasien" disabled style="width: 100%;"></textarea>
                     </span>
                 </section>
                 <section id="tombol-bawah">
@@ -449,6 +450,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
     <script>
         const tmbElm = document.querySelector("#tombol-bawah");
         const dataElm = document.querySelectorAll(".data-pasien");
+        const inputIsiFilterElm = document.querySelector('input[name="filter"]');
 
         function pilihData(tgl, urut) {
             async function getPasien() {
@@ -491,6 +493,17 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             let text = 'Data kunjungan pada tanggal ' + tgl + ' dengan nomor urut ' + urut + ' akan dihapus?';
             if (confirm(text) == true) {
                 window.location.href = "./api.php?function=delKunjungan&tgl=" + tgl + "&urut=" + urut;
+            }
+        }
+
+        function changeFilter(e) {
+            switch (e.target.value) {
+                case "tanggal":
+                    inputIsiFilterElm.type = "date"
+                    break;
+                case "ID":
+                    inputIsiFilterElm.type = "text"
+                    break;
             }
         }
     </script>
