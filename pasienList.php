@@ -232,6 +232,21 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             line-height: 25px;
         }
 
+        .container-form {
+            display: none;
+            position: fixed;
+            height: 100svh;
+            width: 100vw;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+        }
+
+        .container-form.show {
+            display: flex;
+        }
+
         .container-isian {
             display: flex;
             gap: 0.3em;
@@ -413,25 +428,77 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <p>Medical Rec.:</p>
                     </span>
                     <span>
-                        <input class="data-pasien" disabled type="text" name="ID" />
-                        <input class="data-pasien" disabled type="text" name="sex" />
-                        <input class="data-pasien" disabled type="text" name="fullname" />
-                        <input class="data-pasien" disabled type="text" name="Address" />
-                        <input class="data-pasien" disabled type="text" name="tgl_lahir" />
-                        <input class="data-pasien" disabled type="text" name="age" />
-                        <input class="data-pasien" disabled type="text" name="Job" />
-                        <input class="data-pasien" disabled type="text" name="status" />
-                        <input class="data-pasien" disabled type="text" name="BPJS" />
-                        <input class="data-pasien" disabled type="number" name="NoHp" />
-                        <input class="data-pasien" disabled type="text" name="BloodType" />
-                        <input class="data-pasien" disabled type="number" name="NIK" />
-                        <textarea class="data-pasien" disabled name="medicalrecord" rows="4" cols="24"></textarea>
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="number" />
+                        <input class="data-pasien" disabled type="text" />
+                        <input class="data-pasien" disabled type="number" />
+                        <textarea class="data-pasien" disabled rows="4" cols="24"></textarea>
                     </span>
                 </section>
                 <section id="tombol-bawah">
+                    <button disabled>Edit</button>
                     <button class="merah" disabled id="delete-button">Delete</button>
                 </section>
                 <h2>Total Patients: <?= $totalPasien ?></h2>
+            </div>
+        </div>
+
+        <div class="container-form" id="container-edit-pasien">
+            <div style="width: fit-content; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.5); padding: 1em; border-radius: 1em">
+                <form id="form-edit" action="./api.php?function=editPasien&pag=<?= $_GET['pag'] . (isset($_GET['filter-select']) ? '&filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] : '') ?>" method="post">
+                    <h3>Edit Pasien</h3>
+                    <section class="container-isian" style="margin-bottom: 0.5em;">
+                        <span>
+                            <p>Full Name:</p>
+                            <p>Date of Birth:</p>
+                            <p>Address:</p>
+                            <p>No. HP:</p>
+                            <p>Job:</p>
+                            <p>Sex:</p>
+                            <p>Status:</p>
+                            <p>Blood Type:</p>
+                            <p>BPJS Member?</p>
+                            <p>NIK:</p>
+                            <p>Init MR:</p>
+                        </span>
+                        <span>
+                            <input type="text" name="fullname" required />
+                            <input type="text" name="tgl_lahir" />
+                            <input type="text" name="Address" />
+                            <input type="number" name="NoHP" />
+                            <input type="text" name="Job" />
+                            <select name="sex">
+                                <option value="Laki">Male</option>
+                                <option value="Perempuan">Female</option>
+                            </select>
+                            <input type="text" name="status" />
+                            <select name="BloodType">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="AB">AB</option>
+                                <option value="O">O</option>
+                            </select>
+                            <select name="BPJS">
+                                <option value="T">Ya</option>
+                                <option value="F">Tidak</option>
+                            </select>
+                            <input type="number" name="NIK" />
+                            <textarea name="medicalrecord" rows="10" cols="24"></textarea>
+                        </span>
+                    </section>
+                    <div style="width: 100%; display: flex; justify-content:center; margin-top: 1em; gap: 0.3em">
+                        <button class="hijau" type="submit">Simpan</button>
+                        <button type="button" onclick="closeForm()">Batal</button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>
@@ -440,6 +507,20 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         // const photoIdElm = document.querySelector("#photo-id");
         const tmbElm = document.querySelector("#tombol-bawah");
         const dataElm = document.querySelectorAll(".data-pasien");
+
+        const fullnameElm = document.querySelector('input[name="fullname"]')
+        const tgl_lahirElm = document.querySelector('input[name="tgl_lahir"]')
+        const AddressElm = document.querySelector('input[name="Address"]')
+        const NoHPElm = document.querySelector('input[name="NoHP"]')
+        const JobElm = document.querySelector('input[name="Job"]')
+        const sexElm = document.querySelector('select[name="sex"]')
+        const statusElm = document.querySelector('input[name="status"]')
+        const BloodTypeElm = document.querySelector('select[name="BloodType"]')
+        const BPJSElm = document.querySelector('select[name="BPJS"]')
+        const NIKElm = document.querySelector('input[name="NIK"]')
+        const medicalrecordElm = document.querySelector('textarea[name="medicalrecord"]')
+        const formEditElm = document.getElementById("form-edit");
+        const containerFormEditElm = document.getElementById("container-edit-pasien");
 
         function pilihData(id) {
             async function getPasien() {
@@ -463,7 +544,21 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 const tglSkrg = new Date();
                 dataElm[5].value = tglSkrg.getFullYear() - Number(data.tgl_lahir.split("/")[2]);
 
-                tmbElm.innerHTML = `<button class="merah" onclick="deleteData('${id}')">Delete</button>`;
+                tmbElm.innerHTML = `<button onclick="openForm()" style="margin-right: 3px;">Edit</button><button class="merah" onclick="deleteData('${id}')">Delete</button>`;
+
+                // isi di form edit
+                sexElm.value = data.sex;
+                fullnameElm.value = data.fullname;
+                AddressElm.value = data.Address;
+                tgl_lahirElm.value = data.tgl_lahir;
+                JobElm.value = data.Job;
+                statusElm.value = data.status;
+                BPJSElm.value = data.BPJS;
+                NoHPElm.value = data.NoHp;
+                BloodTypeElm.value = data.BloodType;
+                NIKElm.value = data.NIK;
+                medicalrecordElm.value = data.medicalrecord;
+                formEditElm.action += "&id=" + data.ID;
             }
             getPasien();
 
@@ -503,6 +598,14 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 }
                 deletePasien();
             }
+        }
+
+        function openForm() {
+            containerFormEditElm.classList.add("show");
+        }
+
+        function closeForm() {
+            containerFormEditElm.classList.remove("show");
         }
     </script>
 </body>

@@ -514,6 +514,19 @@ function addPasien()
     echo json_encode($res);
     header("location: ./pasienList.php?pag=1");
 }
+function editPasien()
+{
+    global $conn;
+    if (!empty($_GET["id"])) {
+        $id = $_GET["id"];
+    }
+    $query = $conn->query("UPDATE pasien SET fullname='" . $_POST['fullname'] . "',tgl_lahir='" . $_POST['tgl_lahir'] . "',BPJS='" . $_POST['BPJS'] . "',Address='" . $_POST['Address'] . "',sex='" . $_POST['sex'] . "',NoHp='" . $_POST['NoHp'] . "',status='" . $_POST['status'] . "',Job='" . $_POST['Job'] . "',medicalrecord='" . $_POST['medicalrecord'] . "',BloodType='" . $_POST['BloodType'] . "',NIK='" . $_POST['NIK'] . "' WHERE ID='" . $id . "'");
+    if (isset($_GET['filter-select'])) {
+        header("location: ./pasienList.php?filter-select=" . $_GET['filter-select'] . "&filter=" . $_GET['filter'] . "&pag=" . $_GET['pag']);
+    } else {
+        header("location: ./pasienList.php?pag=" . $_GET['pag']);
+    }
+}
 
 function cekFoto()
 {
