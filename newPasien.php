@@ -243,15 +243,18 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <option value="Perempuan">Female</option>
                         </select>
                         <input type="text" name="status" />
-                        <select name="BloodType" required>
+                        <select name="BloodType">
                             <option value="A" selected="selected">A</option>
                             <option value="B">B</option>
                             <option value="AB">AB</option>
                             <option value="O">O</option>
                         </select>
-                        <input type="text" name="BPJS" required />
+                        <select name="BPJS">
+                            <option value="T" selected="selected">Ya</option>
+                            <option value="F">Tidak</option>
+                        </select>
                         <input type="number" name="NIK" required />
-                        <textarea name="medicalrecord" rows="10" cols="24" required></textarea>
+                        <textarea name="medicalrecord" rows="10" cols="24"></textarea>
                         <input type="file" name="photo" style="display: none" disabled="true" />
                     </span>
                 </section>
