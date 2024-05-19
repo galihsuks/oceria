@@ -291,36 +291,30 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                                         color: white;
                                     ">
                                     <th>No.</th>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Address</th>
+                                    <th>Waktu Antri</th>
+                                    <th>ID Pasien</th>
+                                    <th>Nama Pasien</th>
+                                    <th>Tensi</th>
+                                    <th>Berat</th>
+                                    <th>Tinggi</th>
+                                    <th>Suhu</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
                                 include('api.php');
-                                if (isset($_GET['filter-select'])) {
-                                    if ($_GET['filter-select'] == "fullname") {
-                                        $data_pasien_lengkap = getPasienNama();
-                                        $data_pasien = $data_pasien_lengkap['dataLimit'];
-                                    } else if ($_GET['filter-select'] == "ID") {
-                                        $data_pasien_lengkap = getPasienId();
-                                        $data_pasien = $data_pasien_lengkap['dataLimit'];
-                                    } else if ($_GET['filter-select'] == "Address") {
-                                        $data_pasien_lengkap = getPasienAddress();
-                                        $data_pasien = $data_pasien_lengkap['dataLimit'];
-                                    }
-                                } else {
-                                    $data_pasien_lengkap = getAllPasien();
-                                    $data_pasien = $data_pasien_lengkap['dataLimit'];
-                                }
-                                $no = ($_GET['pag'] - 1) * 25 + 1;
-                                foreach ($data_pasien as $data) {
-                                    echo '<tr onclick="pilihData(`' . $data->ID . '`)">
+                                $data_antrian = getAllAntrian();
+                                $no = 1;
+                                foreach ($data_antrian as $data) {
+                                    echo '<tr onclick="pilihData(`' . $data->id_pasien . '`,`' . $data->tensi . '`,`' . $data->berat . '`,`' . $data->tinggi . '`,`' . $data->suhu . '`,`' . $data->waktu . '`)">
                                         <td>' . $no . '</td>
-                                        <td>' . $data->ID . '</td>
-                                        <td>' . $data->fullname . '</td>
-                                        <td>' . $data->Address . '</td>
+                                        <td>' . $data->waktu . '</td>
+                                        <td>' . $data->id_pasien . '</td>
+                                        <td>' . $data->nama_pasien . '</td>
+                                        <td>' . $data->tensi . '</td>
+                                        <td>' . $data->berat . '</td>
+                                        <td>' . $data->tinggi . '</td>
+                                        <td>' . $data->suhu . '</td>
                                         </tr>';
                                     $no++;
                                 }
@@ -329,30 +323,9 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         </table>
                     </div>
                 </section>
-                <div class="paginasi" style="margin-inline: auto; width: fit-content; display: flex; gap: 5px;">
-                    <?php if (!isset($_GET['filter-select'])) { ?>
-                        <?= $_GET['pag'] > 1 ? '<a class="tombol" href="./inputKunjungan.php?pag=' . ($_GET['pag'] - 1) . '">Prev</a>' : '' ?>
-                        <?php
-                        $data_status = getStatus();
-                        if ($_GET['pag'] * 25 < $data_status->totalPasien) {
-                            echo '<a class="tombol" href="./inputKunjungan.php?pag=' . ($_GET['pag'] + 1) . '">Next</a>';
-                        }
-                        ?>
-                    <?php } else { ?>
-                        <?php
-                        $totalPasien = count($data_pasien_lengkap['dataAll']);
-                        if ($_GET['pag'] > 1) {
-                            echo '<a class="tombol" href="./inputKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] - 1) . '">Prev</a>';
-                        }
-                        if ($_GET['pag'] * 25 < $totalPasien) {
-                            echo '<a class="tombol" href="./inputKunjungan.php?filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] . '&pag=' . ($_GET['pag'] + 1) . '">Next</a>';
-                        }
-                        ?>
-                    <?php } ?>
-                </div>
             </div>
             <div class="kanan">
-                <form method="post" action="./api.php?function=addKunjungan">
+                <form method="post" action="./api.php?function=addKunjungan" id="form-add-kunjungan">
                     <section class="container-isian">
                         <span>
                             <p>Tgl. Kunjungan:</p>
@@ -392,9 +365,9 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <p>Address:</p>
                         </span>
                         <span>
-                            <input class="data-pasien" type="text" required name="ID_pasien" value="<?= isset($_GET['id']) ? $_GET['id'] : '' ?>" />
-                            <input class="data-pasien" disabled type="text" required value="<?= isset($_GET['nama']) ? $_GET['nama'] : '' ?>" />
-                            <input class="data-pasien" disabled type="text" required value="<?= isset($_GET['alamat']) ? $_GET['alamat'] : '' ?>" />
+                            <input class="data-pasien" type="text" required name="ID_pasien" />
+                            <input class="data-pasien" disabled type="text" required />
+                            <input class="data-pasien" disabled type="text" required />
                         </span>
                     </section>
                     <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
@@ -407,10 +380,10 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <p>Suhu Badan:</p>
                         </span>
                         <span>
-                            <input class="data-pasien" type="text" required name="tensi" value="<?= isset($_GET['tensi']) ? $_GET['tensi'] : '' ?>" />
-                            <input class="data-pasien" type="number" required name="berat" value="<?= isset($_GET['berat']) ? $_GET['berat'] : '' ?>" />
-                            <input class="data-pasien" type="number" required name="tinggi" value="<?= isset($_GET['tinggi']) ? $_GET['tinggi'] : '' ?>" />
-                            <input class="data-pasien" type="number" required name="suhu" value="<?= isset($_GET['suhu']) ? $_GET['suhu'] : '' ?>" />
+                            <input class="data-pasien" type="text" required name="tensi" />
+                            <input class="data-pasien" type="number" required name="berat" />
+                            <input class="data-pasien" type="number" required name="tinggi" />
+                            <input class="data-pasien" type="number" required name="suhu" />
                         </span>
                     </section>
                     <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
@@ -455,20 +428,23 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
     </main>
     <script>
         const dataElm = document.querySelectorAll(".data-pasien");
+        const formAddKunjunganFom = document.getElementById("form-add-kunjungan");
 
-        function pilihData(id) {
+        function pilihData(id, tensi, berat, tinggi, suhu, waktu) {
             async function getPasien() {
                 const res = await fetch("./api.php?function=getPasien&id=" + id);
                 const data = (await res.json()).data;
                 dataElm[0].value = data.ID;
                 dataElm[1].value = data.fullname;
                 dataElm[2].value = data.Address;
-                dataElm[3].value = '0';
-                dataElm[4].value = '0';
-                dataElm[5].value = '0';
-                dataElm[6].value = '0';
+                dataElm[3].value = tensi;
+                dataElm[4].value = berat;
+                dataElm[5].value = tinggi;
+                dataElm[6].value = suhu;
             }
             getPasien();
+
+            formAddKunjunganFom.action = "./api.php?function=addKunjungan&waktu=" + waktu
         }
     </script>
 </body>

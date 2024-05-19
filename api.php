@@ -215,11 +215,11 @@ function addKunjungan()
             'mysqli_error' => mysqli_error($conn)
         );
     }
-
+    $query = $conn->query("DELETE FROM antrian WHERE waktu = '{$_GET['waktu']}'");
     updateTotalKunjungan(true);
     // header('Content-Type: application/json');
     // echo json_encode($res);
-    header("location: ./daftarKunjungan.php?pag=1");
+    header("location: ./inputKunjungan.php?pag=1");
 }
 function generateNoUrut($tanggal)
 {

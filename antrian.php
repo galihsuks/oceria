@@ -340,20 +340,31 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                     <tbody>
                         <?php
                         $getAllAntrian = getAllAntrian();
+                        // foreach ($getAllAntrian as $data) {
+                        //     if ($data->status == 'Mengantri') {
+                        //         $button = '<a href="./api.php?function=updateAntrian&waktu=' . $data->waktu . '" class="tombol">Selesai</a>
+                        //                           <a href="./api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
+                        //         $tr = '<tr>';
+                        //     } else {
+                        //         $button = '<a class="tombol" href="./inputKunjungan.php?pag=1&id=' . $data->id_pasien . '&nama=' . $data->nama_pasien . '&alamat=' . $data->alamat_pasien . '&tensi=' . $data->tensi . '&berat=' . $data->berat . '&tinggi=' . $data->tinggi . '&suhu=' . $data->suhu . '">Tambahkan Kunjungan</a>
+                        //                         <a href="./api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
+                        //         $tr = '<tr class="teks-hijau">';
+                        //     }
+                        //     echo $tr . '<td>' . $data->waktu . '</td>
+                        //             <td>' . $data->nama_pasien . '</td>
+                        //             <td>' . $button . '</td>
+                        //             </tr>';
+                        // }
                         foreach ($getAllAntrian as $data) {
                             if ($data->status == 'Mengantri') {
                                 $button = '<a href="./api.php?function=updateAntrian&waktu=' . $data->waktu . '" class="tombol">Selesai</a>
                                                   <a href="./api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
                                 $tr = '<tr>';
-                            } else {
-                                $button = '<a class="tombol" href="./inputKunjungan.php?pag=1&id=' . $data->id_pasien . '&nama=' . $data->nama_pasien . '&alamat=' . $data->alamat_pasien . '&tensi=' . $data->tensi . '&berat=' . $data->berat . '&tinggi=' . $data->tinggi . '&suhu=' . $data->suhu . '">Tambahkan Kunjungan</a>
-                                                <a href="./api.php?function=hapusAntrian&waktu=' . $data->waktu . '" class="tombol">Hapus</a>';
-                                $tr = '<tr class="teks-hijau">';
+                                echo $tr . '<td>' . $data->waktu . '</td>
+                                        <td>' . $data->nama_pasien . '</td>
+                                        <td>' . $button . '</td>
+                                        </tr>';
                             }
-                            echo $tr . '<td>' . $data->waktu . '</td>
-                                    <td>' . $data->nama_pasien . '</td>
-                                    <td>' . $button . '</td>
-                                    </tr>';
                         }
                         ?>
                     </tbody>
