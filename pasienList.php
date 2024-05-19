@@ -1,6 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
+    $_SESSION['url_before_login'] = './pasienList.php?pag=1';
     header('Location: ./login.php');
     die();
 }
@@ -476,8 +477,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <input type="number" name="NoHP" />
                             <input type="text" name="Job" />
                             <select name="sex">
-                                <option value="Laki">Male</option>
-                                <option value="Perempuan">Female</option>
+                                <option value="L">Male</option>
+                                <option value="P">Female</option>
                             </select>
                             <input type="text" name="status" />
                             <select name="BloodType">
@@ -494,6 +495,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                             <textarea name="medicalrecord" rows="10" cols="24"></textarea>
                         </span>
                     </section>
+                    <input type="text" name="id" style="display: none;">
                     <div style="width: 100%; display: flex; justify-content:center; margin-top: 1em; gap: 0.3em">
                         <button class="hijau" type="submit">Simpan</button>
                         <button type="button" onclick="closeForm()">Batal</button>
@@ -521,6 +523,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         const medicalrecordElm = document.querySelector('textarea[name="medicalrecord"]')
         const formEditElm = document.getElementById("form-edit");
         const containerFormEditElm = document.getElementById("container-edit-pasien");
+
+        const idElm = document.querySelector('input[name="id"]');
 
         function pilihData(id) {
             async function getPasien() {
@@ -558,7 +562,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 BloodTypeElm.value = data.BloodType;
                 NIKElm.value = data.NIK;
                 medicalrecordElm.value = data.medicalrecord;
-                formEditElm.action += "&id=" + data.ID;
+                idElm.value = id;
             }
             getPasien();
 

@@ -1,6 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
+    $_SESSION['url_before_login'] = './newPasien.php';
     header('Location: ./login.php');
     die();
 }
@@ -239,8 +240,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                         <input type="number" name="NoHP" />
                         <input type="text" name="Job" />
                         <select name="sex" required>
-                            <option value="Laki" selected="selected">Male</option>
-                            <option value="Perempuan">Female</option>
+                            <option value="L" selected="selected">Male</option>
+                            <option value="P">Female</option>
                         </select>
                         <input type="text" name="status" />
                         <select name="BloodType">

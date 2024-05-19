@@ -256,6 +256,22 @@ function generateNoUrut($tanggal)
     // header('Content-Type: application/json');
     // echo json_encode($res);
 }
+function editKunjungan()
+{
+    global $conn;
+    if (!empty($_POST["tgl"]) && !empty($_POST["urut"])) {
+        $tgl = $_POST["tgl"];
+        $urut = $_POST["urut"];
+    }
+    $strQuery = "UPDATE kunjungan SET NoUrut='" . $_POST['NoUrut'] . "',tgl_praktek='" . $_POST['tgl_praktek'] . "',ID_pasien='" . $_POST['ID_pasien'] . "',BPJS='" . $_POST['BPJS'] . "',Exo_Perm='" . $_POST['Exo_Perm'] . "',Exo_Susu='" . $_POST['Exo_Susu'] . "',LC='" . $_POST['LC'] . "',Fuji='" . $_POST['Fuji'] . "',RawatSyaraf='" . $_POST['RawatSyaraf'] . "',Scalling='" . $_POST['Scalling'] . "',Antibiotik='" . $_POST['Antibiotik'] . "',Analgetik='" . $_POST['Analgetik'] . "',AntiRadang='" . $_POST['AntiRadang'] . "',Lain_Lain='" . $_POST['Lain_Lain'] . "',tensi='" . $_POST['tensi'] . "',berat='" . $_POST['berat'] . "',tinggi='" . $_POST['tinggi'] . "',suhu='" . $_POST['suhu'] . "' WHERE tgl_praktek = '$tgl' && NoUrut = '$urut'";
+    // echo $strQuery;
+    $query = $conn->query($strQuery);
+    if (isset($_GET['filter-select'])) {
+        header("location: ./daftarKunjungan.php?filter-select=" . $_GET['filter-select'] . "&filter=" . $_GET['filter'] . "&pag=" . $_GET['pag']);
+    } else {
+        header("location: ./daftarKunjungan.php?pag=" . $_GET['pag']);
+    }
+}
 
 //=============== PASIEN ===============//
 
@@ -517,8 +533,8 @@ function addPasien()
 function editPasien()
 {
     global $conn;
-    if (!empty($_GET["id"])) {
-        $id = $_GET["id"];
+    if (!empty($_POST["id"])) {
+        $id = $_POST["id"];
     }
     $query = $conn->query("UPDATE pasien SET fullname='" . $_POST['fullname'] . "',tgl_lahir='" . $_POST['tgl_lahir'] . "',BPJS='" . $_POST['BPJS'] . "',Address='" . $_POST['Address'] . "',sex='" . $_POST['sex'] . "',NoHp='" . $_POST['NoHp'] . "',status='" . $_POST['status'] . "',Job='" . $_POST['Job'] . "',medicalrecord='" . $_POST['medicalrecord'] . "',BloodType='" . $_POST['BloodType'] . "',NIK='" . $_POST['NIK'] . "' WHERE ID='" . $id . "'");
     if (isset($_GET['filter-select'])) {

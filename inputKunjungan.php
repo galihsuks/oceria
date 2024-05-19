@@ -1,6 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
+    $_SESSION['url_before_login'] = './inputKunjungan.php?pag=1';
     header('Location: ./login.php');
     die();
 }

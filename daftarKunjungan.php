@@ -1,6 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
+    $_SESSION['url_before_login'] = './daftarKunjungan.php?pag=1';
     header('Location: ./login.php');
     die();
 }
@@ -218,6 +219,21 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
 
         .card p {
             line-height: 25px;
+        }
+
+        .container-form {
+            display: none;
+            position: fixed;
+            height: 100svh;
+            width: 100vw;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+        }
+
+        .container-form.show {
+            display: flex;
         }
 
         .container-isian {
@@ -439,11 +455,93 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                     </span>
                 </section>
                 <section id="tombol-bawah">
-                    <button class="merah" disabled id="delete-button">
-                        Delete
-                    </button>
+                    <button disabled>Edit</button>
+                    <button class="merah" disabled id="delete-button">Delete</button>
                 </section>
                 <h2>Total Patients: <?= $totalKunjungan ?></h2>
+            </div>
+        </div>
+
+        <div class="container-form" id="container-edit-kunjungan">
+            <div style="width: fit-content; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.5); padding: 1em; border-radius: 1em">
+                <form id="form-kunjungan" action="./api.php?function=editKunjungan&pag=<?= $_GET['pag'] . (isset($_GET['filter-select']) ? '&filter-select=' . $_GET['filter-select'] . '&filter=' . $_GET['filter'] : '') ?>" method="post">
+                    <h3>Edit Kunjungan</h3>
+                    <section class="container-isian">
+                        <span>
+                            <p>Tgl. Kunjungan:</p>
+                            <p>No.Urut per bulan:</p>
+                        </span>
+                        <span>
+                            <input type="text" required name="tgl_praktek" />
+                            <input type="number" required name="NoUrut" />
+                        </span>
+                    </section>
+                    <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                    <h3>Pasien</h3>
+                    <section class="container-isian">
+                        <span>
+                            <p>Patient's ID:</p>
+                        </span>
+                        <span>
+                            <input class="data-pasien" type="text" required name="ID_pasien" />
+                        </span>
+                    </section>
+                    <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                    <h3>Pemeriksaan</h3>
+                    <section class="container-isian">
+                        <span>
+                            <p>Tensi:</p>
+                            <p>Berat Badan:</p>
+                            <p>Tinggi Badan:</p>
+                            <p>Suhu Badan:</p>
+                        </span>
+                        <span>
+                            <input class="data-pasien" type="text" required name="tensi" />
+                            <input class="data-pasien" type="number" required name="berat" />
+                            <input class="data-pasien" type="number" required name="tinggi" />
+                            <input class="data-pasien" type="number" required name="suhu" />
+                        </span>
+                    </section>
+                    <div style="width: 70%; height: 1.5px; background-color: gainsboro; margin-block: 0.5em;"></div>
+                    <h3>Tindakan & Obat</h3>
+                    <section class="container-isian" style="margin-bottom: 0.5em;">
+                        <span>
+                            <p>BPJS:</p>
+                            <p>Exo Permanen:</p>
+                            <p>Exo Susu</p>
+                            <p>Light Curing (LC):</p>
+                            <p>Fuji:</p>
+                            <p>Rawat Saraf:</p>
+                            <p>Scalling:</p>
+                            <p>Antibiotik:</p>
+                            <p>Analgetik:</p>
+                            <p>Anti Radang:</p>
+                            <p>Lain-Lain:</p>
+                        </span>
+                        <span>
+                            <select name="BPJS">
+                                <option value="True" selected>Ya</option>
+                                <option value="False">Tidak</option>
+                            </select>
+                            <input type="number" required value="0" name="Exo_Perm" />
+                            <input type="number" required value="0" name="Exo_Susu" />
+                            <input type="number" required value="0" name="LC" />
+                            <input type="number" required value="0" name="Fuji" />
+                            <input type="number" required value="0" name="RawatSyaraf" />
+                            <input type="number" required value="0" name="Scalling" />
+                            <input type="number" required value="0" name="Antibiotik" />
+                            <input type="number" required value="0" name="Analgetik" />
+                            <input type="number" required value="0" name="AntiRadang" />
+                            <textarea name="Lain_Lain" style="width: 100%;"></textarea>
+                        </span>
+                    </section>
+                    <input type="text" style="display: none;" name="tgl">
+                    <input type="text" style="display: none;" name="urut">
+                    <div style="width: 100%; display: flex; justify-content:center; margin-top: 1em; gap: 0.3em">
+                        <button class="hijau" type="submit">Simpan</button>
+                        <button type="button" onclick="closeForm()">Batal</button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>
@@ -451,6 +549,30 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
         const tmbElm = document.querySelector("#tombol-bawah");
         const dataElm = document.querySelectorAll(".data-pasien");
         const inputIsiFilterElm = document.querySelector('input[name="filter"]');
+
+        const tgl_praktekElm = document.querySelector('input[name="tgl_praktek"]')
+        const NoUrutElm = document.querySelector('input[name="NoUrut"]')
+        const ID_pasienElm = document.querySelector('input[name="ID_pasien"]')
+        const tensiElm = document.querySelector('input[name="tensi"]')
+        const beratElm = document.querySelector('input[name="berat"]')
+        const suhuElm = document.querySelector('input[name="suhu"]')
+        const tinggiElm = document.querySelector('input[name="tinggi"]')
+        const BPJSElm = document.querySelector('select[name="BPJS"]')
+        const Exo_PermElm = document.querySelector('input[name="Exo_Perm"]')
+        const Exo_SusuElm = document.querySelector('input[name="Exo_Susu"]')
+        const LCElm = document.querySelector('input[name="LC"]')
+        const FujiElm = document.querySelector('input[name="Fuji"]')
+        const RawatSyarafElm = document.querySelector('input[name="RawatSyaraf"]')
+        const ScallingElm = document.querySelector('input[name="Scalling"]')
+        const AntibiotikElm = document.querySelector('input[name="Antibiotik"]')
+        const AnalgetikElm = document.querySelector('input[name="Analgetik"]')
+        const AntiRadangElm = document.querySelector('input[name="AntiRadang"]')
+        const Lain_LainElm = document.querySelector('textarea[name="Lain_Lain"]')
+        const formKunjunganElm = document.getElementById("form-kunjungan");
+        const containerFormKunjunganElm = document.getElementById("container-edit-kunjungan");
+
+        const tglElm = document.querySelector('input[name="tgl"]');
+        const urutElm = document.querySelector('input[name="urut"]');
 
         function pilihData(tgl, urut) {
             async function getPasien() {
@@ -484,7 +606,33 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                 dataElm[18].value = dataKun.AntiRadang;
                 dataElm[19].value = dataKun.Lain_Lain;
 
-                tmbElm.innerHTML = `<button class="merah" onclick="deleteData('${tgl}','${urut}')">Delete</button>`;
+                tmbElm.innerHTML = `<button onclick="openForm()" style="margin-right: 3px;">Edit</button><button class="merah" onclick="deleteData('${tgl}','${urut}')">Delete</button>`;
+
+                //isi form kunjungan
+                NoUrutElm.value = dataKun.NoUrut;
+                tgl_praktekElm.value = dataKun.tgl_praktek;
+
+                ID_pasienElm.value = dataKun.ID_pasien;
+
+                tensiElm, value = dataKun.tensi;
+                beratElm.value = dataKun.berat;
+                tinggiElm.value = dataKun.tinggi;
+                suhuElm.value = dataKun.suhu;
+
+                BPJSElm.value = dataKun.BPJS;
+                Exo_PermElm.value = dataKun.Exo_Perm;
+                Exo_SusuElm.value = dataKun.Exo_Susu;
+                LCElm.value = dataKun.LC;
+                FujiElm.value = dataKun.Fuji;
+                RawatSyarafElm.value = dataKun.RawatSyaraf;
+                ScallingElm.value = dataKun.Scalling;
+                AntibiotikElm.value = dataKun.Antibiotik;
+                AnalgetikElm.value = dataKun.Analgetik;
+                AntiRadangElm.value = dataKun.AntiRadang;
+                Lain_LainElm.value = dataKun.Lain_Lain;
+
+                tglElm.value = dataKun.tgl_praktek;
+                urutElm.value = dataKun.NoUrut;
             }
             getPasien();
         }
@@ -505,6 +653,14 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                     inputIsiFilterElm.type = "text"
                     break;
             }
+        }
+
+        function openForm() {
+            containerFormKunjunganElm.classList.add("show");
+        }
+
+        function closeForm() {
+            containerFormKunjunganElm.classList.remove("show");
         }
     </script>
 </body>

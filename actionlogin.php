@@ -9,5 +9,5 @@ if ($username != 'admin' || $password != '123456') {
     return die();
 }
 $_SESSION['login'] = true;
-header('Location: ./pasienList.php?pag=1');
+header('Location: ' . $_SESSION['url_before_login']);
 die();
