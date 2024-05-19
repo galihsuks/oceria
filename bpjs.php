@@ -1,16 +1,40 @@
 <?php
+function loadEnv($path)
+{
+    if (!file_exists($path)) {
+        throw new Exception('.env file not found.');
+    }
+
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) {
+            continue;
+        }
+
+        list($name, $value) = explode('=', $line, 2);
+        $name = trim($name);
+        $value = trim($value);
+
+        if (!array_key_exists($name, $_SERVER) && !array_key_exists($name, $_ENV)) {
+            putenv(sprintf('%s=%s', $name, $value));
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
+        }
+    }
+}
+loadEnv(__DIR__ . '/.env');
+
 date_default_timezone_set('UTC');
 $tStamp = strval(time() - strtotime('1970-01-01 00:00:00'));
-$kodePPK = '0150G017';
-$consId = '1384';
-$secretKey = '8kQABD0F66';
-$userkeyPCare = '002f4d85a8df265f8a4a1f46df3aec15';
-$username = '0150G017';
-$password = 'Sriumiati74#';
+$kodePPK = $_ENV['KODE_PPK'];
+$consId = $_ENV['CONS_ID'];
+$secretKey = $_ENV['SECRET_KEY'];
+$userkeyPCare = $_ENV['USER_KEY_PCARE'];
+$username = $_ENV['USERNAME'];
+$password = $_ENV['PASSWORD'];
 $auth = base64_encode($username . ":" . $password);
 $variabel1 = $consId . "&" . $tStamp;
 $signature = base64_encode(hash_hmac('sha256', $variabel1, $secretKey, true));
-
 
 $curl = curl_init();
 curl_setopt_array($curl, array(
