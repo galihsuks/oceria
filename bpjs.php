@@ -120,51 +120,75 @@ if ($fitur == 'peserta-get') {
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "POST";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: text/plain";
     $arrCurl[CURLOPT_POSTFIELDS] = json_encode([
-        "noKunjungan" => $_POST[''],
-        "noKartu" => $_POST[''],
-        "tglDaftar" => $_POST[''],
-        "kdPoli" => $_POST[''],
-        "keluhan" => $_POST[''],
-        "kdSadar" => $_POST[''],
-        "sistole" => $_POST[''],
-        "diastole" => $_POST[''],
-        "beratBadan" => $_POST[''],
-        "tinggiBadan" => $_POST[''],
-        "respRate" => $_POST[''],
-        "heartRate" => $_POST[''],
-        "lingkarPerut" => $_POST[''],
-        "kdStatusPulang" => $_POST[''],
-        "tglPulang" => $_POST[''],
-        "kdDokter" => $_POST[''],
-        "kdDiag1" => $_POST[''],
-        "kdDiag2" => $_POST[''],
-        "kdDiag3" => $_POST[''],
-        "kdPoliRujukInternal" => $_POST[''],
+        "noKunjungan" => $_POST['noKunjungan'],
+        "noKartu" => $_POST['noKartu'],
+        "tglDaftar" => $_POST['tglDaftar'],
+        "kdPoli" => $_POST['kdPoli'],
+        "keluhan" => $_POST['keluhan'],
+        "kdSadar" => $_POST['kdSadar'],
+        "sistole" => $_POST['sistole'],
+        "diastole" => $_POST['diastole'],
+        "beratBadan" => $_POST['beratBadan'],
+        "tinggiBadan" => $_POST['tinggiBadan'],
+        "respRate" => $_POST['respRate'],
+        "heartRate" => $_POST['heartRate'],
+        "lingkarPerut" => $_POST['lingkarPerut'],
+        "kdStatusPulang" => $_POST['kdStatusPulang'],
+        "tglPulang" => $_POST['tglPulang'],
+        "kdDokter" => $_POST['kdDokter'],
+        "kdDiag1" => $_POST['kdDiag1'],
+        "kdDiag2" => $_POST['kdDiag2'],
+        "kdDiag3" => $_POST['kdDiag3'],
+        "kdPoliRujukInternal" => $_POST['kdPoliRujukInternal'],
         "rujukLanjut" => [
-            "tglEstRujuk" => $_POST[''],
-            "kdppk" => $_POST[''],
+            "tglEstRujuk" => $_POST['tglEstRujuk'],
+            "kdppk" => $_POST['kdppk'],
             "subSpesialis" => [
-                "kdSubSpesialis1" => $_POST[''],
-                "kdSarana" => $_POST['']
+                "kdSubSpesialis1" => $_POST['kdSubSpesialis1'],
+                "kdSarana" => $_POST['kdSarana']
             ],
             "khusus" => [
-                "kdKhusus" => $_POST[''],
-                "kdSubSpesialis" => $_POST[''],
-                "catatan" => $_POST['']
+                "kdKhusus" => $_POST['kdKhusus'],
+                "kdSubSpesialis" => $_POST['kdSubSpesialis'],
+                "catatan" => $_POST['catatan']
             ]
         ],
-        "kdTacc" => $_POST[''],
-        "alasanTacc" => $_POST[''],
-        "anamnesa" => $_POST[''],
-        "alergiMakan" => $_POST[''],
-        "alergiUdara" => "00",
-        "alergiObat" => "00",
-        "kdPrognosa" => "01",
-        "terapiObat" => "test terapi obat",
-        "terapiNonObat" => "test terapi nonobat",
-        "bmhp" => "bmhp",
-        "suhu" => "36,4"
+        "kdTacc" => $_POST['kdTacc'],
+        "alasanTacc" => $_POST['alasanTacc'],
+        "anamnesa" => $_POST['anamnesa'],
+        "alergiMakan" => $_POST['alergiMakan'],
+        "alergiUdara" => $_POST['alergiUdara'],
+        "alergiObat" => $_POST['alergiObat'],
+        "kdPrognosa" => $_POST['kdPrognosa'],
+        "terapiObat" => $_POST['terapiObat'],
+        "terapiNonObat" => $_POST['terapiNonObat'],
+        "bmhp" => $_POST['bmhp'],
+        "suhu" => $_POST['suhu']
     ]);
+} else if ($fitur == 'alergi-get') {
+    $arrCurl[CURLOPT_URL] = $baseUrl . "/alergi/jenis/" . $_GET['param1'];
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+} else if ($fitur == 'prognosa-get') {
+    $arrCurl[CURLOPT_URL] = $baseUrl . "/prognosa";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+} else if ($fitur == 'diagnosa-get') {
+    $arrCurl[CURLOPT_URL] = $baseUrl . "/diagnosa/" . $_GET['param1'] . "/1/15";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+} else if ($fitur == 'kesadaran-get') {
+    $arrCurl[CURLOPT_URL] = $baseUrl . "/kesadaran";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+} else if ($fitur == 'dokter-get') {
+    $arrCurl[CURLOPT_URL] = $baseUrl . "/dokter/1/15";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+} else if ($fitur == 'status-pulang-get') {
+    $arrCurl[CURLOPT_URL] = $baseUrl . "/statuspulang/rawatInap/" . $_GET['param1'];
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
 }
 
 
