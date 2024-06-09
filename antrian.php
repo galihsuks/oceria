@@ -104,6 +104,53 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
             color: var(--putih);
         }
 
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            width: 90%;
+            margin-inline: auto;
+        }
+
+        .nav h1 a {
+            font-size: 25px;
+            font-weight: 900;
+            text-decoration: none;
+            color: var(--hijau);
+        }
+
+        .nav ul {
+            display: block;
+            height: fit-content;
+        }
+
+        .nav li {
+            text-decoration: none;
+            list-style-type: none;
+            display: inline-block;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .nav li.active a {
+            font-weight: 700;
+        }
+
+        .nav li a {
+            padding-inline: 10px;
+            text-decoration: none;
+            display: block;
+            line-height: 50px;
+            color: var(--hitam);
+        }
+
+        .nav li:hover {
+            background-color: var(--hijau);
+            transition: 0.1s;
+        }
+
         .container-tabel {
             overflow-y: auto;
             height: calc(100% - 130px);
@@ -194,7 +241,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
 
 <body>
     <header>
-        <div style="
+        <!-- <div style="
                     display: flex;
                     justify-content: space-between;
                     width: 100%;
@@ -212,7 +259,19 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] == false) {
                     height: 1px;
                     background-color: var(--hitam);
                     margin-top: 1em;
-                "></span>
+                "></span> -->
+        <div class="nav">
+            <h1><a href="./">Oceria</a></h1>
+            <ul>
+                <li class="active"><a href="./listantrian.php">Lihat Antrian</a></li>
+                <li><a href="./addantrian.php">Tambah Antrian</a></li>
+                <li class="logout"><a href="./actionlogout.php">Logout</a></li>
+            </ul>
+            <span style="text-align: right">
+                <p><b>My Dentist</b></p>
+                <p>online version</p>
+            </span>
+        </div>
     </header>
     <main>
         <section style="margin-bottom: 1.5em">

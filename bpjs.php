@@ -1,4 +1,5 @@
 <?php
+require_once "koneksi.php";
 function loadEnv($path)
 {
     if (!file_exists($path)) {
@@ -37,7 +38,6 @@ $variabel1 = $consId . "&" . $tStamp;
 $signature = base64_encode(hash_hmac('sha256', $variabel1, $secretKey, true));
 
 $baseUrl = "https://apijkn-dev.bpjs-kesehatan.go.id/pcare-rest-dev";
-$curl = curl_init();
 $arrCurl = [
     CURLOPT_SSL_VERIFYHOST => 0,
     CURLOPT_SSL_VERIFYPEER => 0,
@@ -73,21 +73,43 @@ $arrCurl = [
     ],
 ];
 
-$fitur = $_GET['fitur'];
-if ($fitur == 'peserta-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/peserta/" . $_GET['param1'] . "/" . $_GET['param2']; //nik atau noka; nomronya
+$isJson = false;
+if (isset($_GET['fitur'])) {
+    $isJson = true;
+    $_GET['fitur']();
+}
+function pesertaGet($param1 = false, $param2 = false)
+{
+    if (!$param1)
+        $param1 = $_GET['param1'];
+    if (!$param2)
+        $param2 = $_GET['param2'];
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/peserta/" . $param1 . "/" . $param2; //nik atau noka; nomronya
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'poli-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/poli/fktp/0/20";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function poliGet()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/poli/fktp/0/20";
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'provider-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/provider/0/100";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function providerGet()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/provider/0/100";
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'pendaftaran-add') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/pendaftaran";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function pendaftaranAdd()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/pendaftaran";
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "POST";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: text/plain";
     $arrCurl[CURLOPT_POSTFIELDS] = json_encode([
@@ -104,19 +126,42 @@ if ($fitur == 'peserta-get') {
         "respRate" => $_POST['respRate'],
         "lingkarPerut" => $_POST['lingkarPerut'],
         "heartRate" => $_POST['heartRate'],
-        "rujukBalik" => $_POST['rujukBalik'],
+        "rujukBalik" => '0', //Belum tau apa itu rujuk balik
         "kdTkp" => $_POST['kdTkp']
     ]);
-} else if ($fitur == 'pendaftaran-get-tgl') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/pendaftaran/tglDaftar/" . $_GET['param1'] . "/0/15";
+
+    global $conn;
+    $d = strtotime("+7 Hours");
+    $waktu = date("Y-m-d H:i:s", $d);
+    $conn->query("INSERT INTO antrian (waktu, id_pasien, nama_pasien, alamat_pasien, tensi, berat, tinggi, suhu, status) VALUES ('$waktu', '{$_POST['id']}', '{$_POST['nama']}', '{$_POST['alamat']}', '{$_POST['tensi']}', '{$_POST['berat']}', '{$_POST['tinggi']}', '{$_POST['suhu']}', 'Mengantri')");
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function pendaftaranGetTgl($param1 = false)
+{
+    if (!$param1)
+        $param1 = $_GET['param1'];
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/pendaftaran/tglDaftar/" . $param1 . "/0/15";
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'pendaftaran-get-urut') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/pendaftaran/noUrut/" . $_GET['param1'] . "/tglDaftar/" . $_GET['param2'];
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function pendaftaranGetUrut($param1 = false, $param2 = false)
+{
+    if (!$param1)
+        $param1 = $_GET['param1'];
+    if (!$param2)
+        $param2 = $_GET['param2'];
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/pendaftaran/noUrut/" . $param1 . "/tglDaftar/" . $param2;
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'kunjungan-add') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/kunjungan";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function kunjunganAdd()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/kunjungan";
     $arrCurl[CURLOPT_CUSTOMREQUEST] = "POST";
     $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: text/plain";
     $arrCurl[CURLOPT_POSTFIELDS] = json_encode([
@@ -165,76 +210,124 @@ if ($fitur == 'peserta-get') {
         "bmhp" => $_POST['bmhp'],
         "suhu" => $_POST['suhu']
     ]);
-} else if ($fitur == 'alergi-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/alergi/jenis/" . $_GET['param1'];
-    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
-    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'prognosa-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/prognosa";
-    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
-    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'diagnosa-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/diagnosa/" . $_GET['param1'] . "/1/15";
-    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
-    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'kesadaran-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/kesadaran";
-    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
-    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'dokter-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/dokter/1/15";
-    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
-    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
-} else if ($fitur == 'status-pulang-get') {
-    $arrCurl[CURLOPT_URL] = $baseUrl . "/statuspulang/rawatInap/" . $_GET['param1'];
-    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
-    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+    return api($arrCurl, $GLOBALS['isJson']);
 }
-
-
-curl_setopt_array($curl, $arrCurl);
-$response = curl_exec($curl);
-$err = curl_error($curl);
-curl_close($curl);
-if ($err) {
-    return "cURL Error #:" . $err;
-}
-$hasil = json_decode($response, true);
-
-
-// ------------ DEKRIPSI --------------- //
-include 'LZ/LZContext.php';
-include 'LZ/LZData.php';
-include 'LZ/LZReverseDictionary.php';
-include 'LZ/LZString.php';
-include 'LZ/LZUtil.php';
-include 'LZ/LZUtil16.php';
-
-function stringDecrypt($key, $string)
+function alergiGet()
 {
-    $encrypt_method = 'AES-256-CBC';
-    $key_hash = hex2bin(hash('sha256', $key));
-    $iv = substr(hex2bin(hash('sha256', $key)), 0, 16);
-    $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key_hash, OPENSSL_RAW_DATA, $iv);
-    return $output;
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/alergi/jenis/" . $_GET['param1'];
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+    return api($arrCurl, $GLOBALS['isJson']);
 }
-function decompress($string)
+function prognosaGet()
 {
-    return \LZCompressor\LZString::decompressFromEncodedURIComponent($string);
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/prognosa";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+    return api($arrCurl, $GLOBALS['isJson']);
 }
+function diagnosaGet()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/diagnosa/" . $_GET['param1'] . "/1/15";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function kesadaranGet()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/kesadaran";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function dokterGet()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/dokter/1/15";
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+function statusPulangGet()
+{
+    $arrCurl = $GLOBALS['arrCurl'];
+    $arrCurl[CURLOPT_URL] = $GLOBALS['baseUrl'] . "/statuspulang/rawatInap/" . $_GET['param1'];
+    $arrCurl[CURLOPT_CUSTOMREQUEST] = "GET";
+    $arrCurl[CURLOPT_HTTPHEADER][6] = "content-type: application/json";
+    return api($arrCurl, $GLOBALS['isJson']);
+}
+// $fitur = $_GET['fitur'];
+// if ($fitur == 'peserta-get') {
+// } else if ($fitur == 'poli-get') {
+// } else if ($fitur == 'provider-get') {
+// } else if ($fitur == 'pendaftaran-add') {
+// } else if ($fitur == 'pendaftaran-get-tgl') {
+// } else if ($fitur == 'pendaftaran-get-urut') {
+// } else if ($fitur == 'kunjungan-add') {
+// } else if ($fitur == 'alergi-get') {
+// } else if ($fitur == 'prognosa-get') {
+// } else if ($fitur == 'diagnosa-get') {
+// } else if ($fitur == 'kesadaran-get') {
+// } else if ($fitur == 'dokter-get') {
+// } else if ($fitur == 'status-pulang-get') {
+// }
+function api($arrCurl, $isJson)
+{
+    $curl = curl_init();
+    curl_setopt_array($curl, $arrCurl);
+    $response = curl_exec($curl);
+    $err = curl_error($curl);
+    curl_close($curl);
+    if ($err) {
+        return "cURL Error #:" . $err;
+    }
+    $hasil = json_decode($response, true);
 
-$datanya = array(
-    "X-cons-id" => $consId,
-    "X-Timestamp" => $tStamp,
-    "X-Signature" => $signature,
-    "X-Authorization" =>  "Basic " . $auth,
-    "user_key" => $userkeyPCare,
-    "arrCurl" => $arrCurl,
-    "result" => $hasil,
-    "hasil_dekrip" => json_decode(decompress(stringDecrypt($consId . $secretKey . $tStamp, $hasil['response'])), true)
-);
+    // ------------ DEKRIPSI --------------- //
+    include 'LZ/LZContext.php';
+    include 'LZ/LZData.php';
+    include 'LZ/LZReverseDictionary.php';
+    include 'LZ/LZString.php';
+    include 'LZ/LZUtil.php';
+    include 'LZ/LZUtil16.php';
 
+    function stringDecrypt($key, $string)
+    {
+        $encrypt_method = 'AES-256-CBC';
+        $key_hash = hex2bin(hash('sha256', $key));
+        $iv = substr(hex2bin(hash('sha256', $key)), 0, 16);
+        $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key_hash, OPENSSL_RAW_DATA, $iv);
+        return $output;
+    }
+    function decompress($string)
+    {
+        return \LZCompressor\LZString::decompressFromEncodedURIComponent($string);
+    }
 
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-echo json_encode($datanya);
+    // $datanya = array(
+    //     // "X-cons-id" => $consId,
+    //     // "X-Timestamp" => $tStamp,
+    //     // "X-Signature" => $signature,
+    //     // "X-Authorization" =>  "Basic " . $auth,
+    //     // "user_key" => $userkeyPCare,
+    //     // "arrCurl" => $arrCurl,
+    //     "result" => $hasil,
+    //     "hasil_dekrip" => json_decode(decompress(stringDecrypt($GLOBALS['consId'] . $GLOBALS['secretKey'] . $GLOBALS['tStamp'], $hasil['response'])), true)
+    // );
+
+    if ($isJson) {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+
+        if (substr((string)$hasil['metaData']['code'], 0, 1) == 2) {
+            $hasil = json_decode(decompress(stringDecrypt($GLOBALS['consId'] . $GLOBALS['secretKey'] . $GLOBALS['tStamp'], $hasil['response'])), true);
+        }
+        echo json_encode($hasil);
+    } else {
+        return json_decode(decompress(stringDecrypt($GLOBALS['consId'] . $GLOBALS['secretKey'] . $GLOBALS['tStamp'], $hasil['response'])), true);
+    }
+}
